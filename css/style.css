@@ -203,6 +203,198 @@ p {
     text-decoration: underline;
 }
 
+.lab2-page {
+    width: min(100% - 40px, 1180px);
+}
+
+.visualization-card,
+.design-card {
+    margin-top: 28px;
+    padding: clamp(22px, 4vw, 38px);
+    border: 1px solid #e1e6ec;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 18px 48px rgba(32, 50, 71, 0.1);
+}
+
+.visualization-heading {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(280px, 0.8fr);
+    gap: 36px;
+    align-items: end;
+}
+
+.visualization-heading h2 {
+    margin-bottom: 0;
+}
+
+.visualization-heading > p {
+    margin-bottom: 2px;
+    color: #647083;
+    font-size: 15px;
+}
+
+.chart-frame {
+    width: 100%;
+    margin-top: 28px;
+    overflow-x: auto;
+    border: 1px solid #e7ebf0;
+    border-radius: 14px;
+    background: #f9fbfd;
+}
+
+.chart-frame svg {
+    display: block;
+    width: 100%;
+    min-width: 760px;
+    height: auto;
+}
+
+.region-panel {
+    fill: #ffffff;
+    stroke: #dfe5ec;
+    stroke-width: 1.5;
+}
+
+.region-label {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.city-bubble,
+.city-point {
+    cursor: pointer;
+    outline: none;
+}
+
+.bubble-shadow {
+    fill: rgba(35, 54, 74, 0.12);
+}
+
+.bubble-mark {
+    transition: filter 160ms ease, opacity 160ms ease;
+}
+
+.city-bubble:hover .bubble-mark,
+.city-bubble:focus .bubble-mark {
+    filter: brightness(1.06) saturate(1.15);
+}
+
+.bubble-city-name,
+.bubble-population {
+    fill: #172033;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.bubble-city-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.bubble-population {
+    fill: #3e4c5d;
+    font-size: 10px;
+}
+
+.legend-title {
+    fill: #273649;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.legend-value {
+    fill: #5b6878;
+    font-size: 12px;
+}
+
+.grid-lines line {
+    stroke: #dfe5ec;
+    stroke-dasharray: 3 5;
+}
+
+.grid-lines path {
+    display: none;
+}
+
+.chart-axis path,
+.chart-axis line {
+    stroke: #9eabb9;
+}
+
+.chart-axis text {
+    fill: #536173;
+    font-size: 12px;
+}
+
+.axis-title {
+    fill: #273649;
+    font-size: 14px;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.city-point circle {
+    stroke: #ffffff;
+    stroke-width: 2;
+    opacity: 0.88;
+    transition: opacity 160ms ease, stroke-width 160ms ease;
+}
+
+.city-point:hover circle,
+.city-point:focus circle {
+    opacity: 1;
+    stroke: #172033;
+    stroke-width: 3;
+}
+
+.point-label {
+    fill: #3d4a5a;
+    font-size: 11px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.design-card p:last-child {
+    max-width: 880px;
+    margin-bottom: 0;
+    color: #4e5c6e;
+    font-size: 16px;
+}
+
+.tooltip {
+    position: absolute;
+    z-index: 20;
+    display: grid;
+    gap: 3px;
+    min-width: 190px;
+    padding: 12px 14px;
+    border: 1px solid rgba(23, 32, 51, 0.15);
+    border-radius: 9px;
+    color: #354255;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.18);
+    font-size: 13px;
+    line-height: 1.45;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.tooltip strong {
+    margin-bottom: 3px;
+    color: #172033;
+    font-size: 15px;
+}
+
+.tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @media (max-width: 600px) {
     .page-shell {
         width: min(100% - 24px, 1000px);
@@ -215,5 +407,14 @@ p {
 
     .lab-nav a {
         padding: 8px 11px;
+    }
+
+    .lab2-page {
+        width: min(100% - 24px, 1180px);
+    }
+
+    .visualization-heading {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 }
