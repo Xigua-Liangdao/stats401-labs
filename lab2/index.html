@@ -3,17 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 2 — STATS 401</title>
+    <title>Lab 2 — Multivariate City Visualization</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 2</h1>
-            <p>Lab 2 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 2</p>
+            <h1 class="lab-heading">Cities in Four Dimensions</h1>
+            <p class="lab-description">
+                Two coordinated D3 views explore population, temperature,
+                development level, and region across twelve cities.
+            </p>
+        </header>
+
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a class="active" href="index.html" aria-current="page">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a>
+            <a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="visualization-card">
+            <div class="visualization-heading">
+                <div>
+                    <p class="card-label">View 01 · Grouped overview</p>
+                    <h2>Regional City Clusters</h2>
+                </div>
+                <p>
+                    Bubble area shows population, fill color shows temperature,
+                    and outline thickness shows development level.
+                </p>
+            </div>
+            <div id="clustered-bubbles" class="chart-frame" aria-live="polite"></div>
         </section>
+
+        <section class="visualization-card">
+            <div class="visualization-heading">
+                <div>
+                    <p class="card-label">View 02 · Precise comparison</p>
+                    <h2>Population and Temperature</h2>
+                </div>
+                <p>
+                    Position compares the two numeric variables; color and point
+                    size distinguish region and development level.
+                </p>
+            </div>
+            <div id="city-scatterplot" class="chart-frame" aria-live="polite"></div>
+        </section>
+
+        <section class="design-card">
+            <p class="card-label">Design reflection</p>
+            <h2>Design Justification</h2>
+            <p>
+                This page uses two complementary views of the same data. The clustered
+                bubble view emphasizes regional structure. Cities are positioned inside
+                one of four region panels, so region is encoded spatially. Bubble area
+                represents population; a square-root radius scale keeps area proportional
+                to population. Fill color moves from cool blue to warm red to represent
+                average temperature, while outline thickness represents the ordered
+                development levels Low, Medium, and High. The scatterplot provides a more
+                precise comparison: population appears on the x-axis, temperature on the
+                y-axis, region through color, and development level through point size.
+                City labels and interactive tooltips identify every observation and reveal
+                exact values. Using both views lets readers switch between seeing regional
+                groups and examining quantitative relationships. The design makes large,
+                warm, highly developed cities easy to notice while also helping viewers
+                compare patterns across regions.
+            </p>
+        </section>
+
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+
+    <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="lab2.js"></script>
 </body>
 </html>
