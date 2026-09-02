@@ -3,17 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 3 — STATS 401</title>
+    <title>Lab 3 — 2025 LPL Player-Game Records</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 3</h1>
-            <p>Lab 3 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 3</p>
+            <h1 class="lab-heading">2025 LPL Player-Game Records</h1>
+            <p class="lab-description">
+                Python acquired 8,050 League of Legends Pro League observations.
+                Each row represents one player's performance in one game.
+            </p>
+        </header>
+
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a href="../lab2/index.html">Lab 2</a>
+            <a class="active" href="index.html" aria-current="page">Lab 3</a>
+            <a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="visualization-card">
+            <div class="visualization-heading">
+                <div>
+                    <p class="card-label">Acquired dataset · <span id="record-count">8,050</span> records</p>
+                    <h2>Sortable LPL Data Table</h2>
+                </div>
+                <p>
+                    Click any column heading to sort ascending or descending.
+                    Search by team, player, champion, or role.
+                </p>
+            </div>
+
+            <div class="dataset-summary" aria-label="Dataset summary">
+                <div><strong id="game-count">805</strong><span>Distinct games</span></div>
+                <div><strong id="team-count">16</strong><span>LPL teams</span></div>
+                <div><strong>2025</strong><span>Season</span></div>
+            </div>
+
+            <div class="table-controls">
+                <label for="table-search">Search records</label>
+                <input id="table-search" type="search" placeholder="Try: Knight, Weibo, Ahri, mid">
+                <label for="outcome-filter">Outcome</label>
+                <select id="outcome-filter">
+                    <option value="all">All results</option>
+                    <option value="Win">Wins</option>
+                    <option value="Loss">Losses</option>
+                </select>
+            </div>
+
+            <p id="table-status" class="table-status" role="status">Loading LPL records…</p>
+            <div class="chart-frame table-frame" tabindex="0" aria-label="Scrollable LPL data table">
+                <table id="lpl-table">
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="table-pagination" aria-label="Table pages">
+                <button id="previous-page" type="button">← Previous 50</button>
+                <span id="page-readout">Page —</span>
+                <button id="next-page" type="button">Next 50 →</button>
+            </div>
         </section>
+
+        <section class="design-card">
+            <p class="card-label">Data acquisition</p>
+            <h2>Source and Method</h2>
+            <p>
+                The source is
+                <a href="https://oracleselixir.com/tools/downloads">Oracle's Elixir professional match data</a>.
+                A Python script uses <code>requests</code> to download one public annual CSV,
+                then pandas filters the 2025 LPL player rows and saves the result as
+                <code>data/lab3_lpl_2025.csv</code>. The script validates that at least
+                1,000 records were collected and includes timeout, HTTP error handling,
+                an informative user agent, and a delayed fallback if the download fails.
+                Acquisition pagination is not applicable because the source is one annual
+                file; the webpage paginates the resulting records in groups of 50.
+            </p>
+        </section>
+
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="lab3.js"></script>
 </body>
 </html>
