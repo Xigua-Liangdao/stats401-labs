@@ -3,17 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 4 — STATS 401</title>
+    <title>Lab 4 — FPL Fan Sentiment and Engagement</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 4</h1>
-            <p>Lab 4 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab4-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 4: Cleaning Web Data for Visualization</p>
+            <h1 class="lab-heading">FPL Fan Sentiment and Engagement</h1>
+            <p class="lab-description">
+                A RoBERTa analysis of 3,000 Fantasy Premier League tweets asks whether
+                the emotional mix changes when posts receive more interaction.
+            </p>
+        </header>
+
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a>
+            <a class="active" href="index.html" aria-current="page">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="visualization-card">
+            <div class="visualization-heading">
+                <div>
+                    <p class="card-label">Sentiment × engagement</p>
+                    <h2>How does the emotional mix change?</h2>
+                </div>
+                <p>
+                    Each bar is one engagement tier. Color shows the
+                    RoBERTa label; hover a segment for its count and model score.
+                </p>
+            </div>
+
+            <div class="dataset-summary" aria-label="Dataset summary">
+                <div><strong>114,466</strong><span>Source tweets</span></div>
+                <div><strong id="analyzed-count">3,000</strong><span>Scored tweets</span></div>
+                <div><strong>2012–2023</strong><span>Years represented</span></div>
+            </div>
+
+            <div class="lab4-controls" aria-label="Chart filters">
+                <div>
+                    <span class="control-label">Account type</span>
+                    <div class="segmented-control" id="account-filter">
+                        <button class="active" type="button" data-filter="All accounts">All accounts</button>
+                        <button type="button" data-filter="Verified">Verified</button>
+                        <button type="button" data-filter="Not verified">Not verified</button>
+                    </div>
+                </div>
+                <p id="chart-status" class="chart-status" role="status">Loading sentiment summary…</p>
+            </div>
+
+            <div class="chart-frame lab4-chart-frame" id="sentiment-chart" tabindex="0"
+                 aria-label="Stacked bar chart of sentiment share by engagement tier"></div>
+
+            <div class="sentiment-legend" aria-label="Sentiment colors">
+                <span><i class="legend-swatch negative"></i>Negative</span>
+                <span><i class="legend-swatch neutral"></i>Neutral</span>
+                <span><i class="legend-swatch positive"></i>Positive</span>
+            </div>
+            <p class="chart-note">
+                Engagement = likes + retweets + replies. Low means 0 interactions,
+                medium means 1–4, and high means 5 or more.
+            </p>
         </section>
+
+        <section class="visualization-card">
+            <div class="visualization-heading">
+                <div>
+                    <p class="card-label">TF-IDF text features</p>
+                    <h2>Words associated with each model label</h2>
+                </div>
+                <p>
+                    Terms are ranked by their TF-IDF lift over the other two sentiment
+                    groups. A separate lemmatized text field is retained in the clean CSV.
+                </p>
+            </div>
+
+            <div class="term-controls">
+                <span class="control-label">Sentiment</span>
+                <div class="segmented-control" id="term-filter">
+                    <button type="button" data-sentiment="Negative">Negative</button>
+                    <button type="button" data-sentiment="Neutral">Neutral</button>
+                    <button class="active" type="button" data-sentiment="Positive">Positive</button>
+                </div>
+            </div>
+            <div class="chart-frame lab4-chart-frame" id="terms-chart" tabindex="0"
+                 aria-label="Bar chart of top TF-IDF terms"></div>
+        </section>
+
+        <section class="design-card analysis-card">
+            <p class="card-label">Short analysis · 100–200 words</p>
+            <h2>What the visualization suggests</h2>
+            <p id="short-analysis">
+                The analyzed data are a reproducible, year-stratified sample of 3,000 FPL
+                tweets drawn from 114,466 public records spanning 2012–2023. Cleaning filled
+                missing hashtag and location values, parsed timestamps and engagement fields,
+                stripped HTML from sources, normalized URLs and mentions, lemmatized TF-IDF
+                tokens, and replaced rounded source IDs with collision-free hashes. Every retained tweet was
+                scored with cardiffnlp/twitter-roberta-base-sentiment-latest. The D3 bars
+                encode sentiment by color and interactions by tier. Neutral dominates all
+                tiers, but falls from 76.3% among zero-interaction posts to 60.3% at five or
+                more interactions. Positive sentiment rises from 15.5% to 28.4%, while
+                negative rises modestly from 8.2% to 11.3%. Verified accounts are somewhat
+                more positive overall (22.5% versus 18.1%), though only 111 verified posts
+                are sampled, so this contrast should be treated cautiously. TF-IDF lift gives
+                context: positive posts emphasize “join,” “win,” and “good,” while negative
+                posts feature “bad.” RoBERTa labels are model estimates, not ground truth,
+                particularly for sarcasm and non-English posts.
+            </p>
+        </section>
+
+        <section class="design-card">
+            <p class="card-label">Data and method</p>
+            <h2>Reproducible workflow</h2>
+            <div class="method-grid">
+                <article>
+                    <h3>1 · Acquire and sample</h3>
+                    <p>
+                        The source is the CC0
+                        <a href="https://www.kaggle.com/datasets/prasad22/fpl-tweets-dataset">FPL Tweets Dataset</a>.
+                        The Python script can download the Kaggle ZIP and takes 250 valid
+                        records from each year with seed 401. Both the 3,000-row raw sample
+                        and processed data are included in this repository.
+                    </p>
+                </article>
+                <article>
+                    <h3>2 · Clean and engineer</h3>
+                    <p>
+                        Pandas validates 13 fields, removes unusable records, fills missing
+                        categorical values, cleans embedded HTML, creates engagement tiers,
+                        and preserves raw text beside normalized model and TF-IDF text.
+                    </p>
+                </article>
+                <article>
+                    <h3>3 · Score and visualize</h3>
+                    <p>
+                        The required
+                        <a href="https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest">Twitter RoBERTa model</a>
+                        scores every retained tweet. D3 then combines sentiment with
+                        engagement and account verification in an interactive chart.
+                    </p>
+                </article>
+            </div>
+            <p class="repro-note">
+                Reproduce with <code>python lab4/clean_tweets.py</code>. The script,
+                environment requirements, raw sample, cleaned data, chart summary, and
+                TF-IDF terms are all versioned with the page.
+            </p>
+        </section>
+
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+
+    <div class="tooltip" id="lab4-tooltip" role="tooltip"></div>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="lab4.js"></script>
 </body>
 </html>
