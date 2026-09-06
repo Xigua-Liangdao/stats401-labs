@@ -555,6 +555,219 @@ p {
     transform: translateY(0);
 }
 
+/* Lab 4: FPL sentiment analysis */
+.lab4-page .visualization-card,
+.lab4-page .design-card {
+    overflow: hidden;
+}
+
+.lab4-controls,
+.term-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 28px;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 28px;
+}
+
+.lab4-controls > div,
+.term-controls {
+    align-items: flex-start;
+}
+
+.control-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #586477;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.segmented-control {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 4px;
+    border: 1px solid #d8e0e8;
+    border-radius: 9px;
+    background: #eef3f7;
+}
+
+.segmented-control button {
+    padding: 8px 13px;
+    border: 0;
+    border-radius: 6px;
+    color: #4f5d6e;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.segmented-control button:hover,
+.segmented-control button:focus-visible {
+    color: #24384a;
+    background: #ffffff;
+    outline: none;
+}
+
+.segmented-control button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(49, 95, 133, 0.22);
+}
+
+.segmented-control button.active {
+    color: #ffffff;
+    background: #24384a;
+    box-shadow: 0 2px 8px rgba(36, 56, 74, 0.2);
+}
+
+.chart-status {
+    margin: 0 0 7px;
+    color: #586477;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.lab4-chart-frame {
+    position: relative;
+    min-height: 360px;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)),
+        #f9fbfd;
+}
+
+.sentiment-layer rect {
+    cursor: pointer;
+    opacity: 0.92;
+    outline: none;
+    transition: opacity 140ms ease, filter 140ms ease;
+}
+
+.sentiment-layer rect.highlighted,
+.sentiment-layer rect:focus {
+    opacity: 1;
+    filter: brightness(1.08) saturate(1.1);
+    stroke: #172033;
+    stroke-width: 2;
+}
+
+.segment-label {
+    font-size: 14px;
+    font-weight: 700;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.engagement-axis text,
+.term-axis text {
+    fill: #24384a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sentiment-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+    align-items: center;
+    margin-top: 18px;
+    color: #536173;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.sentiment-legend span {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-swatch.negative {
+    background: #a65a5a;
+}
+
+.legend-swatch.neutral {
+    background: #9aa8b6;
+}
+
+.legend-swatch.positive {
+    background: #315f85;
+}
+
+.chart-note,
+.repro-note {
+    margin: 12px 0 0;
+    color: #687486;
+    font-size: 13px;
+}
+
+.term-controls {
+    justify-content: flex-start;
+}
+
+.term-bar {
+    opacity: 0.9;
+}
+
+.term-value {
+    fill: #536173;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.analysis-card {
+    border-left: 5px solid #315f85;
+}
+
+.analysis-card p:last-child {
+    max-width: 970px;
+}
+
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.method-grid article {
+    padding: 19px;
+    border: 1px solid #e1e6ec;
+    border-radius: 12px;
+    background: #f9fbfd;
+}
+
+.method-grid h3 {
+    margin: 0 0 9px;
+    color: #24384a;
+    font-size: 16px;
+}
+
+.method-grid p {
+    margin: 0;
+    color: #586477;
+    font-size: 14px;
+}
+
+.method-grid a,
+.design-card a {
+    color: #315f85;
+}
+
+.repro-note code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #24384a;
+    background: #edf2f6;
+}
+
 @media (max-width: 600px) {
     .page-shell {
         width: min(100% - 24px, 1000px);
@@ -584,5 +797,14 @@ p {
 
     .table-controls {
         grid-template-columns: 1fr;
+    }
+
+    .method-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lab4-controls {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
