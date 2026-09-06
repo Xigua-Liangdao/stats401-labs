@@ -1,0 +1,31 @@
+sentiment,rank,term,mean_tfidf,contrast_tfidf
+Negative,1,just,0.031442,0.025258
+Negative,2,bad,0.022744,0.022337
+Negative,3,league team,0.031037,0.018166
+Negative,4,team,0.041966,0.016293
+Negative,5,i'm,0.018252,0.015186
+Negative,6,shit,0.014286,0.014286
+Negative,7,fantasy premier,0.131675,0.014112
+Negative,8,think,0.015591,0.013388
+Negative,9,getting,0.014366,0.013324
+Negative,10,fuck,0.012832,0.012542
+Neutral,1,tips,0.033632,0.029415
+Neutral,2,gameweek,0.051372,0.026194
+Neutral,3,league tips,0.023979,0.021563
+Neutral,4,fantasy premier,0.124101,0.019059
+Neutral,5,fantasy football,0.024907,0.010423
+Neutral,6,gameweek fantasy,0.032117,0.009601
+Neutral,7,vs,0.010879,0.008626
+Neutral,8,preview,0.009332,0.008522
+Neutral,9,league private,0.009453,0.008229
+Neutral,10,scored points,0.029669,0.00803
+Positive,1,join,0.041219,0.020284
+Positive,2,win,0.021627,0.020177
+Positive,3,points,0.048748,0.016981
+Positive,4,good,0.018718,0.016492
+Positive,5,best,0.019916,0.013481
+Positive,6,liked,0.01238,0.01238
+Positive,7,liked video,0.01238,0.01238
+Positive,8,great,0.012132,0.011529
+Positive,9,video,0.013654,0.011421
+Positive,10,today,0.014125,0.010379

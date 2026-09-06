@@ -1,0 +1,28 @@
+account_filter,engagement_tier,sentiment,count,share,mean_engagement,mean_sentiment_score
+All accounts,Low,Negative,158,0.081612,0.0,-0.746568
+All accounts,Low,Neutral,1478,0.76343,0.0,0.114052
+All accounts,Low,Positive,300,0.154959,0.0,0.775692
+All accounts,Medium,Negative,90,0.111524,1.556,-0.716714
+All accounts,Medium,Neutral,543,0.672862,1.652,0.093817
+All accounts,Medium,Positive,174,0.215613,1.931,0.776717
+All accounts,High,Negative,29,0.11284,98.586,-0.728347
+All accounts,High,Neutral,155,0.603113,287.768,0.117992
+All accounts,High,Positive,73,0.284047,193.466,0.780716
+Verified,Low,Negative,3,0.111111,0.0,-0.870035
+Verified,Low,Neutral,18,0.666667,0.0,0.051504
+Verified,Low,Positive,6,0.222222,0.0,0.785517
+Verified,Medium,Negative,1,0.022222,1.0,-0.791654
+Verified,Medium,Neutral,36,0.8,1.861,0.0663
+Verified,Medium,Positive,8,0.177778,1.875,0.741417
+Verified,High,Negative,4,0.102564,20.75,-0.762847
+Verified,High,Neutral,24,0.615385,884.667,0.134918
+Verified,High,Positive,11,0.282051,345.636,0.82027
+Not verified,Low,Negative,155,0.081194,0.0,-0.744179
+Not verified,Low,Neutral,1460,0.764798,0.0,0.114824
+Not verified,Low,Positive,294,0.154007,0.0,0.775491
+Not verified,Medium,Negative,89,0.116798,1.562,-0.715872
+Not verified,Medium,Neutral,507,0.665354,1.637,0.095771
+Not verified,Medium,Positive,166,0.217848,1.934,0.778418
+Not verified,High,Negative,25,0.114679,111.04,-0.722828
+Not verified,High,Neutral,131,0.600917,178.412,0.114891
+Not verified,High,Positive,62,0.284404,166.468,0.773698
