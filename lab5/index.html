@@ -3,17 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 5 — STATS 401</title>
+    <meta name="description" content="Explore 50 transit stations with a D3 network, adjacency matrix, and six network findings.">
+    <title>Lab 5 — Urban Transit Connections</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="lab5.css">
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 5</h1>
-            <p>Lab 5 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab5-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 5: Interactive Network Visualization</p>
+            <h1 class="lab-heading">Urban Transit Connections</h1>
+            <p class="lab-description">50 stations across five districts. Explore direct connections, passenger volumes, and journey times in a synthetic, undirected transit network.</p>
+        </header>
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a><a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a><a href="../lab4/index.html">Lab 4</a>
+            <a class="active" href="index.html" aria-current="page">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a><a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a><a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+        <p id="load-status" class="load-status" role="status">Loading station and route tables…</p>
+        <noscript><p class="error-message">Enable JavaScript to explore the charts. Source CSV files and written findings are available below.</p></noscript>
+        <section class="visualization-card" aria-labelledby="network-heading">
+            <div class="lab5-section-heading">
+                <div><p class="card-label">01 · Node-link view</p><h2 id="network-heading">Follow the connections</h2></div>
+                <p id="network-counts">50 stations · 50 direct connections</p>
+            </div>
+            <div class="lab5-controls">
+                <label for="station-select">Inspect a station
+                    <select id="station-select" disabled><option value="">All stations</option></select>
+                </label>
+                <button id="reset-network" class="lab5-button" type="button" disabled>Reset view</button>
+            </div>
+            <p class="lab5-help">Drag stations to separate them. Scroll or pinch to zoom; drag the background to pan. Hover for details, or select a station to keep its neighborhood highlighted in both views.</p>
+            <div class="network-layout">
+                <div id="network-chart" class="network-chart" aria-label="Interactive station network"></div>
+                <aside class="station-detail" aria-labelledby="detail-title">
+                    <p class="card-label">Station inspector</p>
+                    <div id="station-detail-content" aria-live="polite">
+                        <h3 id="detail-title">All stations</h3><p>Choose a station to inspect its attributes and direct connections.</p>
+                    </div>
+                </aside>
+            </div>
+            <div class="lab5-legends">
+                <div class="legend-block"><h3>District · node color</h3><div id="district-legend" class="legend-items"></div></div>
+                <div class="legend-block"><h3>Station type · node shape</h3><div id="shape-legend" class="legend-items"></div></div>
+                <div class="legend-block"><h3>Daily passengers · node area</h3><div id="size-legend"></div></div>
+                <div class="legend-block"><h3>Route type · line color &amp; pattern</h3><div id="route-legend" class="legend-items"></div></div>
+                <div class="legend-block"><h3>Travel time · line width</h3><div id="time-legend"></div></div>
+            </div>
+            <p class="chart-note">S7 means Station 7. Node positions are a layout, not geography. A thicker line means a longer trip, not a faster service. Isolated stations have no recorded connections.</p>
         </section>
+        <section class="visualization-card" aria-labelledby="matrix-heading">
+            <div class="lab5-section-heading">
+                <div><p class="card-label">02 · Adjacency matrix</p><h2 id="matrix-heading">Read the network by pairs</h2></div>
+                <label class="matrix-order-label" for="matrix-order">Order both axes
+                    <select id="matrix-order" disabled>
+                        <option value="district">District, then station number</option>
+                        <option value="station">Station number</option>
+                        <option value="type">Station type, then station number</option>
+                    </select>
+                </label>
+            </div>
+            <p class="lab5-help">Rows and columns are stations. A colored cell is a direct connection; an empty cell means none. Color shows route type, and darker cells mean longer travel time. Colored strips mark districts.</p>
+            <div class="matrix-scroll" tabindex="0" role="region" aria-label="Station adjacency matrix; scroll horizontally on small screens"><div id="matrix-chart"></div></div>
+            <div class="matrix-legend-row">
+                <div id="matrix-route-legend" class="legend-items"></div><div id="matrix-time-legend"></div>
+                <span class="matrix-empty-key"><i></i>No direct connection</span>
+            </div>
+            <p id="matrix-summary" class="chart-note">Both halves show the same undirected connections. Blank diagonal cells mean there are no self-connections.</p>
+        </section>
+        <section class="design-card lab5-writeup" aria-labelledby="design-heading">
+            <p class="card-label">03 · Design description</p><h2 id="design-heading">Making attributes readable</h2>
+            <div class="design-columns">
+                <article><h3>Node-link design</h3>
+                    <p data-writeup>Node color identifies district; symbol area scales linearly with daily passengers to emphasize busy stations, and shape distinguishes station types. Line width represents travel time; color and dash pattern identify service. Dragging separates overlaps, highlighting reveals neighbors, and tooltips supply exact values. The lower strip preserves isolated stations without implying geography.</p>
+                </article>
+                <article><h3>Matrix design</h3>
+                    <p data-writeup>Rows and columns represent stations. Filled cells show direct links, hue identifies route type, and opacity increases with travel time. District strips and ordering expose between-district patterns. Tooltips retain station attributes; passenger volume and station type are omitted from cell appearance to preserve readability.</p>
+                </article>
+            </div>
+        </section>
+        <section class="design-card lab5-writeup" aria-labelledby="findings-heading">
+            <p class="card-label">04 · Six network questions</p><h2 id="findings-heading">What the views reveal</h2>
+            <div class="findings-table-wrap"><table class="findings-table">
+                <thead><tr><th scope="col">Question</th><th scope="col">Support / view</th><th scope="col">Visual evidence and observation</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">1. Central stations?</th><td data-writeup>Partially · Both</td><td data-writeup>Neighbor highlighting and filled-cell counts show 14 stations tied at degree three, including S4, S7, and S10. This measures local connectivity, not overall centrality.</td></tr>
+                    <tr><th scope="row">2. Connected districts?</th><td data-writeup>Well · Matrix</td><td data-writeup>The South–East block contains 11 connections, the most between any district pair; Central–North and East–West each have nine.</td></tr>
+                    <tr><th scope="row">3. Transfer / terminal locations?</th><td data-writeup>Well · Node-link</td><td data-writeup>Shapes show Transfer S47/S50 as leaves, Terminal S4/S7 as junctions, and Terminals S43/S46/S49 as isolates. Category does not determine topology.</td></tr>
+                    <tr><th scope="row">4. High passenger volumes?</th><td data-writeup>Well · Node-link</td><td data-writeup>The largest symbols identify S50 (9,850), S49 (9,677), and S48 (9,504); tooltips confirm values. S49/S48 are isolated despite high volume.</td></tr>
+                    <tr><th scope="row">5. Longest direct trips?</th><td data-writeup>Well · Both</td><td data-writeup>Thick lines and dark cells highlight S7–S31 (16 minutes), S18–S34 (15), and S29–S50 (14), all Express.</td></tr>
+                    <tr><th scope="row">6. Route-type concentrations?</th><td data-writeup>Partially · Matrix</td><td data-writeup>Mixed hues span district blocks; both within-Central links are Shuttle. This small concentration is descriptive, not statistical evidence of specialization.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+        <footer class="lab5-sources">
+            <p>Source: <a href="https://github.com/hiilab/stats-401/blob/main/Lab5.md">STATS 401 Lab 5</a> · Synthetic data for visualization practice.</p>
+            <p><a href="../data/lab5_assignment_stations.csv" download>Station CSV</a> · <a href="../data/lab5_assignment_routes.csv" download>Route CSV</a></p>
+            <a class="back-link" href="../index.html">← Back to home</a>
+        </footer>
     </main>
+    <div class="tooltip" id="lab5-tooltip" role="tooltip"></div>
+    <script src="vendor/d3.v7.9.0.min.js"></script>
+    <script src="network-data.js"></script>
+    <script src="lab5.js"></script>
 </body>
 </html>
