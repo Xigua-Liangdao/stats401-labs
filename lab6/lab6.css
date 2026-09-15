@@ -1,0 +1,193 @@
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #563C49;
+    background: #FFF7FA;
+    font-synthesis: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+main {
+    width: min(1160px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 44px 0 56px;
+}
+
+.eyebrow {
+    margin: 0 0 12px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+}
+
+h1 {
+    margin: 0 0 12px;
+    font-size: clamp(30px, 5vw, 44px);
+    letter-spacing: -0.025em;
+}
+
+h2 {
+    margin: 0 0 20px;
+    font-size: 22px;
+}
+
+p {
+    line-height: 1.65;
+}
+
+header > p:last-child {
+    margin: 0;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+    padding: 22px 0;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend i {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.increase {
+    background: #EBA4B6;
+}
+
+.unchanged {
+    background: #EED5BD;
+}
+
+.decrease {
+    background: #CAB8DC;
+}
+
+.units {
+    margin-left: auto;
+}
+
+.chart-section,
+.design {
+    margin-top: 18px;
+    padding: 24px;
+    border: 1px solid #EDDCE4;
+    border-radius: 12px;
+    background: #FFFFFF;
+}
+
+.chart {
+    overflow-x: auto;
+}
+
+.chart svg {
+    display: block;
+    width: 100%;
+    min-width: 980px;
+    height: auto;
+}
+
+.group-frame {
+    fill: #FFF7FA;
+    stroke: #D8BBC9;
+    stroke-width: 1;
+}
+
+.group-frame.continent {
+    fill: #FFF0F5;
+    stroke: #B993A5;
+    stroke-width: 1.5;
+}
+
+.group-label,
+.country-label,
+.gdp-label {
+    fill: #563C49;
+    pointer-events: none;
+}
+
+.group-label,
+.country-label {
+    font-weight: 700;
+}
+
+.country rect {
+    stroke: #FFFFFF;
+    stroke-width: 1.5;
+}
+
+.country:hover rect,
+.country:focus rect {
+    stroke: #563C49;
+    stroke-width: 2;
+}
+
+.country:focus {
+    outline: none;
+}
+
+.design p {
+    max-width: 940px;
+    font-size: 16px;
+}
+
+.design p:last-child {
+    margin-bottom: 0;
+}
+
+#tooltip {
+    position: fixed;
+    z-index: 10;
+    max-width: min(320px, calc(100vw - 20px));
+    padding: 12px 14px;
+    border: 1px solid #D8BBC9;
+    border-radius: 7px;
+    color: #563C49;
+    background: #FFFFFF;
+    font-size: 13px;
+    line-height: 1.6;
+    pointer-events: none;
+    box-shadow: 0 4px 16px #563C491A;
+}
+
+#tooltip strong {
+    display: block;
+    font-size: 15px;
+}
+
+.error {
+    margin: 12px 0;
+}
+
+@media (max-width: 700px) {
+    main {
+        width: calc(100% - 24px);
+        padding-top: 28px;
+    }
+
+    .chart-section,
+    .design {
+        padding: 16px;
+    }
+
+    .units {
+        width: 100%;
+        margin-left: 0;
+    }
+}

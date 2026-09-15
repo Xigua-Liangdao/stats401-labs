@@ -3,17 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 6 — STATS 401</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <title>Lab 6 — GDP Hierarchy</title>
+    <link rel="stylesheet" href="lab6.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+    <script src="lab6.js" defer></script>
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 6</h1>
-            <p>Lab 6 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main>
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 6</p>
+            <h1>GDP Hierarchy</h1>
+            <p>World → Continent → Area → Country</p>
+        </header>
+
+        <div class="legend" aria-label="GDP status legend">
+            <strong>GDP status</strong>
+            <span><i class="increase"></i>Increase</span>
+            <span><i class="unchanged"></i>Unchanged</span>
+            <span><i class="decrease"></i>Decrease</span>
+            <span class="units">Area: GDP in billions of USD</span>
+        </div>
+
+        <section class="chart-section" aria-labelledby="squarify-heading">
+            <h2 id="squarify-heading">1. Squarify</h2>
+            <div id="squarify" class="chart"></div>
+        </section>
+
+        <section class="chart-section" aria-labelledby="binary-heading">
+            <h2 id="binary-heading">2. Binary</h2>
+            <div id="binary" class="chart"></div>
+        </section>
+
+        <section class="design" aria-labelledby="design-heading">
+            <h2 id="design-heading">Design Description</h2>
+            <p>Both treemaps display the same synthetic GDP dataset using the hierarchy World, Continent, Area, and Country. Rectangle area encodes GDP because spatial extent supports comparisons of economic size and contributions to a group. The same pastel colors identify GDP status in both views: berry pink for Increase, cream peach for Unchanged, and lavender for Decrease. Dark text provides contrast against these light colors, and a shared legend makes their meanings explicit.</p>
+            <p>Nested boundaries and group labels show which countries belong to each area and continent. Country labels identify the rectangles, while tooltips provide the full hierarchy, GDP in billions of US dollars, and status. Squarify aims for compact rectangles, which generally makes area comparisons and labels easier to read. Binary repeatedly divides the available space into two groups, producing a different arrangement of rectangular regions. Keeping the dataset, color mapping, canvas size, and ordering consistent makes the effect of the segmentation strategy easier to compare.</p>
         </section>
     </main>
+    <div id="tooltip" role="tooltip" hidden></div>
 </body>
 </html>
