@@ -4,19 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lab 6 — GDP Hierarchy</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="lab6.css">
     <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
     <script src="lab6.js" defer></script>
 </head>
 <body>
-    <main>
+    <main class="page-shell lab2-page lab6-page">
         <header>
             <p class="eyebrow">STATS 401 · Lab 6</p>
-            <h1>GDP Hierarchy</h1>
-            <p>World → Continent → Area → Country</p>
+            <h1 class="lab-heading">GDP Hierarchy</h1>
+            <p class="lab-description">World → Continent → Area → Country</p>
         </header>
 
-        <div class="legend" aria-label="GDP status legend">
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a>
+            <a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a class="active" href="index.html" aria-current="page">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <div class="lab6-legend" aria-label="GDP status legend">
             <strong>GDP status</strong>
             <span><i class="increase"></i>Increase</span>
             <span><i class="unchanged"></i>Unchanged</span>
@@ -24,21 +38,22 @@
             <span class="units">Area: GDP in billions of USD</span>
         </div>
 
-        <section class="chart-section" aria-labelledby="squarify-heading">
+        <section class="visualization-card" aria-labelledby="squarify-heading">
             <h2 id="squarify-heading">1. Squarify</h2>
-            <div id="squarify" class="chart"></div>
+            <div id="squarify" class="chart chart-frame"></div>
         </section>
 
-        <section class="chart-section" aria-labelledby="binary-heading">
+        <section class="visualization-card" aria-labelledby="binary-heading">
             <h2 id="binary-heading">2. Binary</h2>
-            <div id="binary" class="chart"></div>
+            <div id="binary" class="chart chart-frame"></div>
         </section>
 
-        <section class="design" aria-labelledby="design-heading">
+        <section class="design-card" aria-labelledby="design-heading">
             <h2 id="design-heading">Design Description</h2>
             <p>Both treemaps display the same synthetic GDP dataset using the hierarchy World, Continent, Area, and Country. Rectangle area encodes GDP because spatial extent supports comparisons of economic size and contributions to a group. The same pastel colors identify GDP status in both views: berry pink for Increase, cream peach for Unchanged, and lavender for Decrease. Dark text provides contrast against these light colors, and a shared legend makes their meanings explicit.</p>
             <p>Nested boundaries and group labels show which countries belong to each area and continent. Country labels identify the rectangles, while tooltips provide the full hierarchy, GDP in billions of US dollars, and status. Squarify aims for compact rectangles, which generally makes area comparisons and labels easier to read. Binary repeatedly divides the available space into two groups, producing a different arrangement of rectangular regions. Keeping the dataset, color mapping, canvas size, and ordering consistent makes the effect of the segmentation strategy easier to compare.</p>
         </section>
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
     <div id="tooltip" role="tooltip" hidden></div>
 </body>

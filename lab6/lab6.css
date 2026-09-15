@@ -1,106 +1,63 @@
-:root {
-    font-family: Arial, Helvetica, sans-serif;
-    color: #563C49;
-    background: #FFF7FA;
-    font-synthesis: none;
+.lab6-page {
+    padding-top: 36px;
 }
 
-* {
-    box-sizing: border-box;
+.lab6-page .lab-heading {
+    font-size: clamp(32px, 4.5vw, 48px);
 }
 
-body {
-    margin: 0;
+.lab6-page .visualization-card,
+.lab6-page .design-card {
+    padding: clamp(18px, 3vw, 30px);
 }
 
-main {
-    width: min(1160px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 44px 0 56px;
+.lab6-page .visualization-card {
+    box-shadow: 0 8px 28px rgba(32, 50, 71, 0.06);
 }
 
-.eyebrow {
-    margin: 0 0 12px;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    font-weight: 700;
+.lab6-page p {
+    line-height: 1.6;
 }
 
-h1 {
-    margin: 0 0 12px;
-    font-size: clamp(30px, 5vw, 44px);
-    letter-spacing: -0.025em;
-}
-
-h2 {
-    margin: 0 0 20px;
-    font-size: 22px;
-}
-
-p {
-    line-height: 1.65;
-}
-
-header > p:last-child {
-    margin: 0;
-}
-
-.legend {
+.lab6-legend {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 14px 24px;
-    padding: 22px 0;
-    margin-top: 12px;
+    color: #536173;
     font-size: 14px;
 }
 
-.legend span {
+.lab6-legend span {
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.legend i {
+.lab6-legend i {
     width: 16px;
     height: 16px;
     border-radius: 3px;
 }
 
-.increase {
+.lab6-legend .increase {
     background: #EBA4B6;
 }
 
-.unchanged {
+.lab6-legend .unchanged {
     background: #EED5BD;
 }
 
-.decrease {
+.lab6-legend .decrease {
     background: #CAB8DC;
 }
 
-.units {
+.lab6-legend .units {
     margin-left: auto;
 }
 
-.chart-section,
-.design {
-    margin-top: 18px;
-    padding: 24px;
-    border: 1px solid #EDDCE4;
-    border-radius: 12px;
-    background: #FFFFFF;
-}
-
-.chart {
-    overflow-x: auto;
-}
-
-.chart svg {
-    display: block;
-    width: 100%;
+.lab6-page .chart svg {
     min-width: 980px;
-    height: auto;
 }
 
 .group-frame {
@@ -142,32 +99,31 @@ header > p:last-child {
     outline: none;
 }
 
-.design p {
-    max-width: 940px;
+.lab6-page .design-card p {
+    max-width: 880px;
+    color: #4e5c6e;
     font-size: 16px;
-}
-
-.design p:last-child {
-    margin-bottom: 0;
 }
 
 #tooltip {
     position: fixed;
-    z-index: 10;
+    z-index: 20;
     max-width: min(320px, calc(100vw - 20px));
     padding: 12px 14px;
-    border: 1px solid #D8BBC9;
-    border-radius: 7px;
-    color: #563C49;
-    background: #FFFFFF;
+    border: 1px solid rgba(23, 32, 51, 0.15);
+    border-radius: 9px;
+    color: #354255;
+    background: rgba(255, 255, 255, 0.98);
     font-size: 13px;
-    line-height: 1.6;
+    line-height: 1.45;
     pointer-events: none;
-    box-shadow: 0 4px 16px #563C491A;
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.18);
 }
 
 #tooltip strong {
     display: block;
+    margin-bottom: 3px;
+    color: #172033;
     font-size: 15px;
 }
 
@@ -175,18 +131,22 @@ header > p:last-child {
     margin: 12px 0;
 }
 
-@media (max-width: 700px) {
-    main {
-        width: calc(100% - 24px);
-        padding-top: 28px;
+@media (max-width: 600px) {
+    .lab6-page {
+        padding-top: 24px;
     }
 
-    .chart-section,
-    .design {
+    .lab6-page .visualization-card,
+    .lab6-page .design-card {
         padding: 16px;
+        border-radius: 10px;
     }
 
-    .units {
+    .lab6-page .lab-nav a {
+        padding: 8px 10px;
+    }
+
+    .lab6-legend .units {
         width: 100%;
         margin-left: 0;
     }
