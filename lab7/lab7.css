@@ -1,0 +1,286 @@
+.lab7-page {
+    padding-top: 36px;
+}
+
+.lab7-page .lab-heading {
+    font-size: clamp(32px, 4.5vw, 48px);
+}
+
+.lab7-page .visualization-card,
+.lab7-page .design-card {
+    padding: clamp(18px, 3vw, 30px);
+}
+
+.lab7-page .visualization-card {
+    box-shadow: 0 8px 28px rgba(32, 50, 71, 0.06);
+}
+
+.lab7-page p {
+    line-height: 1.6;
+}
+
+.lab7-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+}
+
+.lab7-heading h2,
+.lab7-heading p {
+    margin-bottom: 0;
+}
+
+#current-day {
+    color: #315f85;
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.lab7-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0 18px;
+}
+
+.lab7-controls button {
+    padding: 10px 16px;
+    border: 1px solid #b9c6d4;
+    border-radius: 6px;
+    background: #eef3f8;
+    color: #24384a;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.lab7-controls #play {
+    border-color: #315f85;
+    color: #fff;
+    background: #315f85;
+}
+
+.lab7-controls button:hover:not(:disabled) {
+    filter: brightness(0.94);
+}
+
+.lab7-controls button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.lab7-controls label {
+    margin-left: 12px;
+    color: #536173;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#time-slider {
+    flex: 1;
+    min-width: 160px;
+    min-height: 32px;
+    accent-color: #315f85;
+    cursor: pointer;
+}
+
+.lab7-page :focus-visible {
+    outline: 3px solid rgba(49, 95, 133, 0.4);
+    outline-offset: 3px;
+}
+
+#commercial-network {
+    margin-top: 16px;
+}
+
+#commercial-network svg {
+    min-width: 980px;
+}
+
+.company-node,
+.transaction-link {
+    cursor: pointer;
+    outline: none;
+}
+
+.company-node circle {
+    stroke: #788597;
+    stroke-width: 1.5;
+}
+
+.company-node.inactive circle {
+    fill: #fff;
+    stroke-width: 2;
+}
+
+.company-node:hover circle,
+.company-node:focus circle {
+    stroke: #172033;
+    stroke-width: 3;
+}
+
+.company-node text {
+    fill: #24384a;
+    font-size: 13px;
+    font-weight: 700;
+    text-anchor: middle;
+    pointer-events: none;
+    paint-order: stroke;
+    stroke: #f9fbfd;
+    stroke-width: 4;
+    stroke-linejoin: round;
+}
+
+.transaction-mark {
+    fill: none;
+    stroke-linecap: round;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.transaction-hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 16;
+    pointer-events: stroke;
+}
+
+.transaction-link:hover .transaction-mark,
+.transaction-link:focus .transaction-mark {
+    opacity: 1;
+    filter: brightness(0.72);
+}
+
+.lab7-legends {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 30px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #dce4ed;
+}
+
+.lab7-legends h3 {
+    margin: 0 0 12px;
+    color: #354255;
+    font-size: 14px;
+}
+
+.lab7-legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
+}
+
+.lab7-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #536173;
+    font-size: 14px;
+}
+
+.lab7-legend-item i {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #8792a0;
+    border-radius: 50%;
+}
+
+.lab7-legend-item .link-swatch {
+    width: 24px;
+    height: 4px;
+    border: 0;
+    border-radius: 2px;
+}
+
+.lab7-legends svg {
+    display: block;
+    width: min(100%, 310px);
+    height: auto;
+}
+
+.lab7-legends svg text {
+    fill: #536173;
+    font-size: 13px;
+    text-anchor: middle;
+}
+
+.lab7-findings ol {
+    margin: 22px 0 0;
+    padding-left: 24px;
+}
+
+.lab7-findings li {
+    padding-left: 8px;
+}
+
+.lab7-findings li + li {
+    margin-top: 24px;
+}
+
+.lab7-findings h3 {
+    margin: 0 0 8px;
+    color: #24384a;
+    font-size: 18px;
+}
+
+.lab7-page .lab7-findings p {
+    max-width: none;
+    color: #4e5c6e;
+    font-size: 16px;
+}
+
+#lab7-tooltip {
+    position: fixed;
+    z-index: 20;
+    max-width: min(370px, calc(100vw - 20px));
+    padding: 12px 14px;
+    border: 1px solid rgba(23, 32, 51, 0.15);
+    border-radius: 9px;
+    color: #354255;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.18);
+    font-size: 13px;
+    line-height: 1.5;
+    pointer-events: none;
+}
+
+#lab7-tooltip strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #172033;
+    font-size: 15px;
+}
+
+@media (max-width: 600px) {
+    .lab7-page {
+        padding-top: 24px;
+    }
+
+    .lab7-page .visualization-card,
+    .lab7-page .design-card {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .lab7-page .lab-nav a {
+        padding: 8px 10px;
+    }
+
+    .lab7-legends {
+        grid-template-columns: 1fr;
+    }
+
+    .lab7-controls label {
+        margin-left: 0;
+    }
+}

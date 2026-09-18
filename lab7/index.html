@@ -3,17 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 7 — STATS 401</title>
+    <title>Lab 7 — Commercial Connections over Time</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="lab7.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+    <script src="lab7.js" defer></script>
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 7</h1>
-            <p>Lab 7 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab7-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 7</p>
+            <h1 class="lab-heading">Commercial Connections over Time</h1>
+            <p class="lab-description">12 companies · 60 days · Synthetic, undirected commercial relationships.</p>
+        </header>
+
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a>
+            <a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a>
+            <a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a>
+            <a href="../lab6/index.html">Lab 6</a>
+            <a class="active" href="index.html" aria-current="page">Lab 7</a>
+            <a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a>
+            <a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="visualization-card" aria-labelledby="network-heading">
+            <div class="lab7-heading">
+                <h2 id="network-heading">Daily transaction network</h2>
+                <p id="current-day" aria-live="off">Day 1 · Jan 1, 2026</p>
+            </div>
+            <div class="lab7-controls" aria-label="Animation controls">
+                <button id="play" type="button" disabled>Play</button>
+                <button id="pause" type="button" disabled>Pause</button>
+                <button id="reset" type="button" disabled>Reset</button>
+                <label for="time-slider">Day</label>
+                <input type="range" id="time-slider" min="1" max="60" step="1" value="1" aria-valuetext="Day 1, January 1, 2026" disabled>
+            </div>
+            <p id="daily-summary" class="chart-status" role="status">Loading company and transaction data…</p>
+            <div id="commercial-network" class="chart-frame" role="region" aria-label="Daily company network; scroll horizontally on small screens" tabindex="0"></div>
+            <div class="lab7-legends">
+                <div><h3>Company region · node color</h3><div id="region-legend" class="lab7-legend-items"></div></div>
+                <div><h3>Daily company volume · circle area</h3><div id="volume-legend"></div></div>
+                <div><h3>Transaction type · link color</h3><div id="type-legend" class="lab7-legend-items"></div></div>
+                <div><h3>Transaction amount · link width</h3><div id="amount-legend"></div></div>
+            </div>
+            <p class="chart-note">Hover or focus a company or link for details. Links show only the selected day; new links fade in and inactive links fade out. Small outlined circles mark companies with no transactions that day. Size and width scales stay fixed across all 60 days. Company positions come from one force layout of all relationships and remain fixed to preserve the mental map.</p>
         </section>
+
+        <section class="design-card lab7-findings" aria-labelledby="findings-heading">
+            <h2 id="findings-heading">Temporal Network Questions</h2>
+            <ol>
+                <li>
+                    <h3>How does overall connectivity change?</h3>
+                    <p>Connectivity fluctuates from day to day, but the final period is busier. Mean daily active relationships rise from 5.50 in days 1–20 to 5.60 in days 21–40 and 7.25 in days 41–60. Day 1 has three relationships involving six companies; day 60 has nine relationships involving all twelve. More activity does not always mean one connected network: day 60 still has three separate components.</p>
+                </li>
+                <li>
+                    <h3>Which companies become more central or active?</h3>
+                    <p>Fusion Electronics is most active in days 21–40, averaging $52,681 in daily transaction volume and 2.65 trading partners per day, up from $18,606 and 1.35 partners in days 1–20. In days 41–60, Ion Systems leads at $54,828 per day, followed by Cedar Retail at $45,091. Their larger circles and additional incident links show the shift in activity. Volume sums transaction amounts incident to each company; it does not measure profit.</p>
+                </li>
+                <li>
+                    <h3>When are relatively separate clusters visible?</h3>
+                    <p>Day 1 contains three disconnected pairs: Cedar Retail–Evergreen Foods, Granite Wholesale–Harbor Shipping, and Ion Systems–Lumen Distribution; six companies are isolated. On day 25, five companies form one component around Fusion Electronics, while Cedar Retail–Evergreen Foods remain a separate pair and five companies are isolated. Separate groups persist later: day 60 has an eight-company component and two isolated pairs. Connectivity is determined by links, not physical proximity in the fixed layout.</p>
+                </li>
+                <li>
+                    <h3>Which relationships appear, disappear, or strengthen?</h3>
+                    <p>BlueRiver Logistics–Delta Components has its last transaction on day 20. Fusion Electronics–Harbor Shipping first appears on day 21 and last appears on day 39. Fusion Electronics–Granite Wholesale becomes stronger: its mean amount on active days rises from $8,202 in days 1–20 to $25,003 in days 21–40, then it disappears after day 40. New late-period links include Cedar Retail–Granite Wholesale on day 41 and Fusion Electronics–Ion Systems on day 42. These links are intermittent, not continuously active after their first appearance.</p>
+                </li>
+                <li>
+                    <h3>Does the network become more cross-regional?</h3>
+                    <p>Yes, in the final period. Cross-region relationships account for 70 of 110 daily active links (63.6%) in days 1–20, 71 of 112 (63.4%) in days 21–40, and 105 of 145 (72.4%) in days 41–60. These percentages count daily relationships, rather than weighting by transaction amount. Links joining differently colored nodes reveal the cross-region activity, including the later connections between Asian companies and North American companies such as Fusion Electronics–Ion Systems.</p>
+                </li>
+            </ol>
+        </section>
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+    <div id="lab7-tooltip" role="tooltip" hidden></div>
 </body>
 </html>
