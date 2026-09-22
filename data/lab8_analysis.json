@@ -1,0 +1,1816 @@
+{
+  "source": {
+    "title": "Bulletin of Duke Kunshan University Undergraduate Instruction",
+    "version": "2021–2022 (July 2021)",
+    "url": "https://dku-web-admissions.s3.cn-north-1.amazonaws.com.cn/dkumain/files/V2021-22_DKU_UG_Bulletin.pdf",
+    "accessed": "2026-09-22",
+    "pdf_pages": 400,
+    "sha256": "431bd3fdcdfdf7722783c29502a7600e8ac21ae45fd4785d230d1ab387dc9133"
+  },
+  "corpus": {
+    "raw_passages": 2356,
+    "clean_passages": 1014,
+    "average_words": 84.1,
+    "sections": 79,
+    "chapters": 10,
+    "removed": {
+      "short_fragments": 1243,
+      "duplicates": 89,
+      "malformed_or_table_fragments": 10
+    },
+    "coverage": "Prose on pages 10–396. Cover, contents, calendar/contact tables, small-print footnotes, course-list rows, and fragments under 20 words are excluded. Exact duplicate text is retained only once; chapter, section, subsection, and start/end pages come from PDF bookmarks and text positions."
+  },
+  "model": {
+    "name": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "dimensions": 384,
+    "normalized": true,
+    "window_tokens": 220,
+    "windows": 1040,
+    "aggregation": "Token-count-weighted mean of normalized window vectors, then L2 normalization; no passage tail is truncated."
+  },
+  "umap": {
+    "n_components": 2,
+    "n_neighbors": 15,
+    "min_dist": 0.15,
+    "metric": "cosine",
+    "random_state": 401
+  },
+  "clustering": {
+    "method": "KMeans on normalized original 384-dimensional embeddings",
+    "clusters": 8,
+    "n_init": 20,
+    "random_state": 401,
+    "cosine_silhouette": 0.1002
+  },
+  "topics": [
+    {
+      "id": 0,
+      "name": "Arts & digital media",
+      "count": 80,
+      "terms": [
+        "media",
+        "digital",
+        "art",
+        "cultural",
+        "documentary",
+        "film",
+        "learn",
+        "arts",
+        "sound",
+        "writing"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Chinese language & culture",
+      "count": 90,
+      "terms": [
+        "chinese",
+        "china",
+        "skills",
+        "texts",
+        "social",
+        "cultural",
+        "history",
+        "culture",
+        "world",
+        "international"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Credit & study pathways",
+      "count": 123,
+      "terms": [
+        "credit",
+        "credits",
+        "education",
+        "taken",
+        "academic",
+        "programs",
+        "transfer",
+        "chinese",
+        "undergraduate",
+        "office"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Registration & academic standing",
+      "count": 161,
+      "terms": [
+        "term",
+        "grade",
+        "academic",
+        "credits",
+        "credit",
+        "absence",
+        "leave",
+        "leave absence",
+        "requirements",
+        "probation"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "History, politics & society",
+      "count": 136,
+      "terms": [
+        "political",
+        "world",
+        "american",
+        "religious",
+        "global",
+        "cultural",
+        "war",
+        "social",
+        "examines",
+        "historical"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Science & computing",
+      "count": 166,
+      "terms": [
+        "data",
+        "science",
+        "systems",
+        "topics",
+        "molecular",
+        "materials",
+        "properties",
+        "chemistry",
+        "applications",
+        "physics"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Learning & student support",
+      "count": 137,
+      "terms": [
+        "skills",
+        "academic",
+        "language",
+        "learning",
+        "advising",
+        "learn",
+        "seminar",
+        "community",
+        "knowledge",
+        "research"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Health, environment & policy",
+      "count": 121,
+      "terms": [
+        "policy",
+        "health",
+        "social",
+        "environmental",
+        "economic",
+        "human",
+        "political",
+        "research",
+        "public",
+        "global"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "key": "Part 1: General Information | Introduction",
+      "chapter": "Part 1: General Information",
+      "name": "Introduction",
+      "count": 3,
+      "words": 191,
+      "page": 10,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      "average_words": 63.7,
+      "entropy": 1.585
+    },
+    {
+      "key": "Part 1: General Information | Mission Statement",
+      "chapter": "Part 1: General Information",
+      "name": "Mission Statement",
+      "count": 1,
+      "words": 141,
+      "page": 10,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 141.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 1: General Information | Statement on Diversity and Inclusion",
+      "chapter": "Part 1: General Information",
+      "name": "Statement on Diversity and Inclusion",
+      "count": 1,
+      "words": 146,
+      "page": 10,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 146.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 1: General Information | Who We Are",
+      "chapter": "Part 1: General Information",
+      "name": "Who We Are",
+      "count": 5,
+      "words": 588,
+      "page": 11,
+      "topics": [
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 117.6,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 1: General Information | Partners",
+      "chapter": "Part 1: General Information",
+      "name": "Partners",
+      "count": 8,
+      "words": 505,
+      "page": 12,
+      "topics": [
+        0,
+        1,
+        6,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 63.1,
+      "entropy": 1.061
+    },
+    {
+      "key": "Part 1: General Information | Duke Kunshan University Community Standard",
+      "chapter": "Part 1: General Information",
+      "name": "Duke Kunshan University Community Standard",
+      "count": 1,
+      "words": 136,
+      "page": 13,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 136.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 2: A Liberal Arts Education at Duke Kunshan University | A 21st Century Curriculum",
+      "chapter": "Part 2: A Liberal Arts Education at Duke Kunshan University",
+      "name": "A 21st Century Curriculum",
+      "count": 1,
+      "words": 119,
+      "page": 14,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 119.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 2: A Liberal Arts Education at Duke Kunshan University | A Liberal Arts College Experience",
+      "chapter": "Part 2: A Liberal Arts Education at Duke Kunshan University",
+      "name": "A Liberal Arts College Experience",
+      "count": 1,
+      "words": 153,
+      "page": 14,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 153.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 2: A Liberal Arts Education at Duke Kunshan University | Dual Degrees",
+      "chapter": "Part 2: A Liberal Arts Education at Duke Kunshan University",
+      "name": "Dual Degrees",
+      "count": 1,
+      "words": 92,
+      "page": 14,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 92.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 2: A Liberal Arts Education at Duke Kunshan University | Animating Principles",
+      "chapter": "Part 2: A Liberal Arts Education at Duke Kunshan University",
+      "name": "Animating Principles",
+      "count": 8,
+      "words": 247,
+      "page": 14,
+      "topics": [
+        2,
+        0,
+        1,
+        0,
+        1,
+        0,
+        3,
+        1
+      ],
+      "average_words": 30.9,
+      "entropy": 2.156
+    },
+    {
+      "key": "Part 3: The Curriculum | Overview",
+      "chapter": "Part 3: The Curriculum",
+      "name": "Overview",
+      "count": 4,
+      "words": 578,
+      "page": 16,
+      "topics": [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "average_words": 144.5,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 3: The Curriculum | Key Components",
+      "chapter": "Part 3: The Curriculum",
+      "name": "Key Components",
+      "count": 12,
+      "words": 431,
+      "page": 17,
+      "topics": [
+        0,
+        0,
+        2,
+        5,
+        0,
+        0,
+        5,
+        0
+      ],
+      "average_words": 35.9,
+      "entropy": 1.483
+    },
+    {
+      "key": "Part 3: The Curriculum | Degree Requirements",
+      "chapter": "Part 3: The Curriculum",
+      "name": "Degree Requirements",
+      "count": 29,
+      "words": 2517,
+      "page": 20,
+      "topics": [
+        0,
+        0,
+        13,
+        7,
+        0,
+        1,
+        8,
+        0
+      ],
+      "average_words": 86.8,
+      "entropy": 1.694
+    },
+    {
+      "key": "Part 4: Admission, Scholarships and Financial Aid | Principles of Selection",
+      "chapter": "Part 4: Admission, Scholarships and Financial Aid",
+      "name": "Principles of Selection",
+      "count": 2,
+      "words": 123,
+      "page": 27,
+      "topics": [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 61.5,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 4: Admission, Scholarships and Financial Aid | Application Timelines",
+      "chapter": "Part 4: Admission, Scholarships and Financial Aid",
+      "name": "Application Timelines",
+      "count": 2,
+      "words": 97,
+      "page": 27,
+      "topics": [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 48.5,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 4: Admission, Scholarships and Financial Aid | Application Requirements",
+      "chapter": "Part 4: Admission, Scholarships and Financial Aid",
+      "name": "Application Requirements",
+      "count": 1,
+      "words": 43,
+      "page": 29,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 43.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 4: Admission, Scholarships and Financial Aid | Scholarships and Financial Aid",
+      "chapter": "Part 4: Admission, Scholarships and Financial Aid",
+      "name": "Scholarships and Financial Aid",
+      "count": 3,
+      "words": 209,
+      "page": 29,
+      "topics": [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 69.7,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 5: Financial Information | Tuition and Fees",
+      "chapter": "Part 5: Financial Information",
+      "name": "Tuition and Fees",
+      "count": 2,
+      "words": 135,
+      "page": 31,
+      "topics": [
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 67.5,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 5: Financial Information | Estimated Expenses",
+      "chapter": "Part 5: Financial Information",
+      "name": "Estimated Expenses",
+      "count": 14,
+      "words": 780,
+      "page": 31,
+      "topics": [
+        0,
+        3,
+        1,
+        10,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 55.7,
+      "entropy": 1.095
+    },
+    {
+      "key": "Part 5: Financial Information | Refund",
+      "chapter": "Part 5: Financial Information",
+      "name": "Refund",
+      "count": 9,
+      "words": 320,
+      "page": 34,
+      "topics": [
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 35.6,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Academic Integrity",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Academic Integrity",
+      "count": 5,
+      "words": 516,
+      "page": 36,
+      "topics": [
+        0,
+        0,
+        2,
+        2,
+        0,
+        1,
+        0,
+        0
+      ],
+      "average_words": 103.2,
+      "entropy": 1.522
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Entrance Credit and Placement",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Entrance Credit and Placement",
+      "count": 14,
+      "words": 1161,
+      "page": 37,
+      "topics": [
+        0,
+        1,
+        10,
+        2,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 82.9,
+      "entropy": 1.292
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Transfer of Work Taken Elsewhere",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Transfer of Work Taken Elsewhere",
+      "count": 9,
+      "words": 823,
+      "page": 39,
+      "topics": [
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 91.4,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Time Limit for Completing Undergraduate Degree",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Time Limit for Completing Undergraduate Degree",
+      "count": 1,
+      "words": 73,
+      "page": 41,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 73.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Registration",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Registration",
+      "count": 7,
+      "words": 614,
+      "page": 41,
+      "topics": [
+        0,
+        0,
+        1,
+        6,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 87.7,
+      "entropy": 0.592
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Undergraduate Course Load",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Undergraduate Course Load",
+      "count": 12,
+      "words": 1183,
+      "page": 43,
+      "topics": [
+        0,
+        0,
+        0,
+        12,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 98.6,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Eligibility for Courses",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Eligibility for Courses",
+      "count": 3,
+      "words": 337,
+      "page": 46,
+      "topics": [
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 112.3,
+      "entropy": 0.918
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Course Repeat",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Course Repeat",
+      "count": 6,
+      "words": 591,
+      "page": 46,
+      "topics": [
+        0,
+        0,
+        2,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 98.5,
+      "entropy": 0.918
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Course Audit",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Course Audit",
+      "count": 1,
+      "words": 206,
+      "page": 47,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 206.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Two-Credit Writing Courses",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Two-Credit Writing Courses",
+      "count": 1,
+      "words": 120,
+      "page": 48,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 120.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Independent Studies",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Independent Studies",
+      "count": 2,
+      "words": 232,
+      "page": 48,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "average_words": 116.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Submission of Term Paper",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Submission of Term Paper",
+      "count": 1,
+      "words": 41,
+      "page": 49,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 41.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Declaration of Major",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Declaration of Major",
+      "count": 2,
+      "words": 265,
+      "page": 49,
+      "topics": [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 132.5,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Class Attendance and Missed Work",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Class Attendance and Missed Work",
+      "count": 3,
+      "words": 293,
+      "page": 49,
+      "topics": [
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 97.7,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Class Scheduling",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Class Scheduling",
+      "count": 1,
+      "words": 46,
+      "page": 50,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 46.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Incomplete Coursework and Excused Absence from Final Exam",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Incomplete Coursework and Excused Absence from Final Exam",
+      "count": 3,
+      "words": 506,
+      "page": 50,
+      "topics": [
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 168.7,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Final Examinations",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Final Examinations",
+      "count": 3,
+      "words": 347,
+      "page": 51,
+      "topics": [
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 115.7,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Grading and Grade Requirements",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Grading and Grade Requirements",
+      "count": 19,
+      "words": 2006,
+      "page": 51,
+      "topics": [
+        0,
+        0,
+        4,
+        15,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 105.6,
+      "entropy": 0.742
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Progress toward Degree",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Progress toward Degree",
+      "count": 5,
+      "words": 363,
+      "page": 56,
+      "topics": [
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 72.6,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Academic Warning, Probation, and Suspension for Students in the Classes of 2022-2024",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Academic Warning, Probation, and Suspension for Students in the Classes of 2022-2024",
+      "count": 9,
+      "words": 964,
+      "page": 57,
+      "topics": [
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 107.1,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Academic Warning, Probation, and Suspension for Students in the Class of 2025 and Beyond",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Academic Warning, Probation, and Suspension for Students in the Class of 2025 and Beyond",
+      "count": 7,
+      "words": 560,
+      "page": 59,
+      "topics": [
+        0,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 80.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Changes in Status",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Changes in Status",
+      "count": 12,
+      "words": 1296,
+      "page": 61,
+      "topics": [
+        0,
+        0,
+        5,
+        7,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 108.0,
+      "entropy": 0.98
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Academic Recognition and Honors",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Academic Recognition and Honors",
+      "count": 4,
+      "words": 420,
+      "page": 63,
+      "topics": [
+        0,
+        0,
+        1,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 105.0,
+      "entropy": 0.811
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Notification of Intention to Graduate",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Notification of Intention to Graduate",
+      "count": 1,
+      "words": 116,
+      "page": 64,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 116.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Graduation and Commencement",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Graduation and Commencement",
+      "count": 1,
+      "words": 84,
+      "page": 64,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 84.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Education Records",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Education Records",
+      "count": 4,
+      "words": 222,
+      "page": 64,
+      "topics": [
+        0,
+        0,
+        3,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 55.5,
+      "entropy": 0.811
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | The Provision of Academic Information to Parents and Guardians",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "The Provision of Academic Information to Parents and Guardians",
+      "count": 1,
+      "words": 68,
+      "page": 65,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 68.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Procedure for Resolution of Students' Academic Concerns",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Procedure for Resolution of Students' Academic Concerns",
+      "count": 5,
+      "words": 414,
+      "page": 65,
+      "topics": [
+        0,
+        0,
+        1,
+        3,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 82.8,
+      "entropy": 1.371
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Grade Review Procedure",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Grade Review Procedure",
+      "count": 5,
+      "words": 474,
+      "page": 66,
+      "topics": [
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 94.8,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Exclusion of Disruptive Students from a Course",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Exclusion of Disruptive Students from a Course",
+      "count": 2,
+      "words": 115,
+      "page": 67,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 57.5,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Compliance with Academic Regulations",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Compliance with Academic Regulations",
+      "count": 1,
+      "words": 79,
+      "page": 67,
+      "topics": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 79.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 6: Academic Procedures and Information | Religious Holidays",
+      "chapter": "Part 6: Academic Procedures and Information",
+      "name": "Religious Holidays",
+      "count": 1,
+      "words": 107,
+      "page": 67,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 107.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 7: Academic Advising and Support | Introduction",
+      "chapter": "Part 7: Academic Advising and Support",
+      "name": "Introduction",
+      "count": 1,
+      "words": 83,
+      "page": 69,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 83.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 7: Academic Advising and Support | Academic Advising",
+      "chapter": "Part 7: Academic Advising and Support",
+      "name": "Academic Advising",
+      "count": 4,
+      "words": 417,
+      "page": 69,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        3,
+        0
+      ],
+      "average_words": 104.2,
+      "entropy": 0.811
+    },
+    {
+      "key": "Part 7: Academic Advising and Support | Academic Resource Center",
+      "chapter": "Part 7: Academic Advising and Support",
+      "name": "Academic Resource Center",
+      "count": 5,
+      "words": 330,
+      "page": 70,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        0
+      ],
+      "average_words": 66.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 7: Academic Advising and Support | Seven Principles of Duke Kunshan University Academic Advising",
+      "chapter": "Part 7: Academic Advising and Support",
+      "name": "Seven Principles of Duke Kunshan University Academic Advising",
+      "count": 6,
+      "words": 145,
+      "page": 70,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6,
+        0
+      ],
+      "average_words": 24.2,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 8: Career Services, Study Away, and Research Opportunities | Career Services",
+      "chapter": "Part 8: Career Services, Study Away, and Research Opportunities",
+      "name": "Career Services",
+      "count": 11,
+      "words": 471,
+      "page": 72,
+      "topics": [
+        0,
+        1,
+        4,
+        1,
+        0,
+        0,
+        5,
+        0
+      ],
+      "average_words": 42.8,
+      "entropy": 1.677
+    },
+    {
+      "key": "Part 8: Career Services, Study Away, and Research Opportunities | Student Research Opportunities",
+      "chapter": "Part 8: Career Services, Study Away, and Research Opportunities",
+      "name": "Student Research Opportunities",
+      "count": 2,
+      "words": 166,
+      "page": 73,
+      "topics": [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 83.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 8: Career Services, Study Away, and Research Opportunities | Office of Global Education and Study Away",
+      "chapter": "Part 8: Career Services, Study Away, and Research Opportunities",
+      "name": "Office of Global Education and Study Away",
+      "count": 19,
+      "words": 1659,
+      "page": 73,
+      "topics": [
+        0,
+        0,
+        13,
+        5,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 87.3,
+      "entropy": 1.105
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Student Affairs",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Student Affairs",
+      "count": 2,
+      "words": 64,
+      "page": 77,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "average_words": 32.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Student Affairs Conceptual Framework",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Student Affairs Conceptual Framework",
+      "count": 1,
+      "words": 156,
+      "page": 77,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 156.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Residence Life",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Residence Life",
+      "count": 2,
+      "words": 173,
+      "page": 77,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "average_words": 86.5,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Accommodations",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Accommodations",
+      "count": 3,
+      "words": 241,
+      "page": 78,
+      "topics": [
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 80.3,
+      "entropy": 0.918
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Leadership Development",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Leadership Development",
+      "count": 1,
+      "words": 89,
+      "page": 78,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 89.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Campus Engagement",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Campus Engagement",
+      "count": 1,
+      "words": 53,
+      "page": 79,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 53.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Arts and Culture",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Arts and Culture",
+      "count": 1,
+      "words": 113,
+      "page": 79,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 113.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Blue Oasis Student Center",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Blue Oasis Student Center",
+      "count": 1,
+      "words": 105,
+      "page": 79,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 105.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Campus Programs",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Campus Programs",
+      "count": 3,
+      "words": 271,
+      "page": 79,
+      "topics": [
+        0,
+        1,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 90.3,
+      "entropy": 0.918
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Student Clubs and Organizations",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Student Clubs and Organizations",
+      "count": 1,
+      "words": 115,
+      "page": 80,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 115.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Athletics & University Sports",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Athletics & University Sports",
+      "count": 5,
+      "words": 240,
+      "page": 80,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        4,
+        0
+      ],
+      "average_words": 48.0,
+      "entropy": 0.722
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Counseling and Psychological Services (CAPS)",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Counseling and Psychological Services (CAPS)",
+      "count": 2,
+      "words": 197,
+      "page": 81,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 98.5,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Campus Health Clinic",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Campus Health Clinic",
+      "count": 1,
+      "words": 157,
+      "page": 81,
+      "topics": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 157.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Chinese Student Services and Student Mobility",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Chinese Student Services and Student Mobility",
+      "count": 2,
+      "words": 204,
+      "page": 82,
+      "topics": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 102.0,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | International Student Services",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "International Student Services",
+      "count": 2,
+      "words": 95,
+      "page": 82,
+      "topics": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 47.5,
+      "entropy": 1.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Host Family Program",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Host Family Program",
+      "count": 1,
+      "words": 45,
+      "page": 82,
+      "topics": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 45.0,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 9: Student Affairs and Campus Life | Student Conduct",
+      "chapter": "Part 9: Student Affairs and Campus Life",
+      "name": "Student Conduct",
+      "count": 3,
+      "words": 182,
+      "page": 83,
+      "topics": [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "average_words": 60.7,
+      "entropy": 1.585
+    },
+    {
+      "key": "Part 10: Majors and Courses | Requirements for All Majors",
+      "chapter": "Part 10: Majors and Courses",
+      "name": "Requirements for All Majors",
+      "count": 4,
+      "words": 126,
+      "page": 84,
+      "topics": [
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "average_words": 31.5,
+      "entropy": -0.0
+    },
+    {
+      "key": "Part 10: Majors and Courses | Majors (listed in alphabetical order)",
+      "chapter": "Part 10: Majors and Courses",
+      "name": "Majors (listed in alphabetical order)",
+      "count": 74,
+      "words": 6333,
+      "page": 86,
+      "topics": [
+        5,
+        5,
+        0,
+        9,
+        7,
+        23,
+        10,
+        15
+      ],
+      "average_words": 85.6,
+      "entropy": 2.598
+    },
+    {
+      "key": "Part 10: Majors and Courses | Course Descriptions",
+      "chapter": "Part 10: Majors and Courses",
+      "name": "Course Descriptions",
+      "count": 597,
+      "words": 50830,
+      "page": 217,
+      "topics": [
+        73,
+        76,
+        6,
+        4,
+        128,
+        141,
+        65,
+        104
+      ],
+      "average_words": 85.1,
+      "entropy": 2.62
+    }
+  ],
+  "top_terms": [
+    {
+      "term": "academic",
+      "count": 263
+    },
+    {
+      "term": "social",
+      "count": 233
+    },
+    {
+      "term": "chinese",
+      "count": 232
+    },
+    {
+      "term": "term",
+      "count": 211
+    },
+    {
+      "term": "global",
+      "count": 194
+    },
+    {
+      "term": "world",
+      "count": 193
+    },
+    {
+      "term": "study",
+      "count": 192
+    },
+    {
+      "term": "credits",
+      "count": 184
+    },
+    {
+      "term": "political",
+      "count": 181
+    },
+    {
+      "term": "major",
+      "count": 178
+    },
+    {
+      "term": "topics",
+      "count": 172
+    },
+    {
+      "term": "china",
+      "count": 167
+    }
+  ]
+}

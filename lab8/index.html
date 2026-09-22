@@ -3,17 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 8 — STATS 401</title>
+    <title>Lab 8 — Exploring the DKU Bulletin</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="lab8.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+    <script src="lab8.js" defer></script>
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 8</h1>
-            <p>Lab 8 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab8-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 8</p>
+            <h1 class="lab-heading">Exploring the DKU Bulletin</h1>
+            <p class="lab-description">How the bulletin's chapters and sections relate to the ideas in its passages.</p>
+        </header>
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a><a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a><a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a><a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a><a class="active" href="index.html" aria-current="page">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a><a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="design-card" aria-labelledby="corpus-heading">
+            <h2 id="corpus-heading">Bulletin and corpus</h2>
+            <p>Bulletin of Duke Kunshan University Undergraduate Instruction, <strong>2021–2022 (July 2021)</strong>. The course-provided PDF has 400 pages. Accessed September 22, 2026. <a href="https://dku-web-admissions.s3.cn-north-1.amazonaws.com.cn/dkumain/files/V2021-22_DKU_UG_Bulletin.pdf" target="_blank" rel="noopener">Official source</a> · <a href="../data/lab8_bulletin_2021_2022.pdf" target="_blank" rel="noopener">PDF used here</a></p>
+            <div class="lab8-stats" aria-label="Corpus statistics">
+                <div><strong id="raw-count">—</strong><span>Raw passage candidates</span></div>
+                <div><strong id="clean-count">—</strong><span>Clean passages</span></div>
+                <div><strong id="average-length">—</strong><span>Words per passage, on average</span></div>
+                <div><strong id="section-count">—</strong><span>Formal sections</span></div>
+            </div>
+            <p id="corpus-scope" class="chart-note">Loading corpus statistics…</p>
         </section>
+
+        <section class="visualization-card" aria-labelledby="overview-heading">
+            <h2 id="overview-heading">Corpus overview</h2>
+            <div class="lab8-overview">
+                <div><h3>Passages by section</h3><p class="chart-note">The ten largest formal sections.</p><div id="section-summary"></div></div>
+                <div><h3>Frequent meaningful terms</h3><p class="chart-note">Word occurrences; common stop words and generic course terms excluded.</p><div id="term-summary"></div></div>
+            </div>
+        </section>
+
+        <section class="visualization-card" aria-labelledby="map-heading" id="semantic-map">
+            <h2 id="map-heading">Semantic passage map</h2>
+            <div class="lab8-controls">
+                <label>Search passages<input type="search" id="search" placeholder="Try credit or academic integrity" disabled></label>
+                <label>Formal section<select id="section-filter" disabled><option value="">All sections</option></select></label>
+                <label>Semantic topic<select id="topic-filter" disabled><option value="">All topics</option></select></label>
+                <button id="reset-view" type="button" disabled>Reset view</button>
+            </div>
+            <p id="map-status" class="chart-status" role="status">Loading passages…</p>
+            <div class="lab8-map-layout">
+                <div>
+                    <div id="embedding-map" aria-label="Interactive semantic passage map"></div>
+                    <div class="lab8-map-key"><div id="size-legend"></div><span><i class="selected-key"></i>Selected</span><span><i class="neighbor-key"></i>Five nearest</span></div>
+                    <p class="chart-note">Scroll to zoom and drag to pan. Circle size shows passage length. UMAP axes have no separate meaning; nearby points only approximate semantic similarity.</p>
+                </div>
+                <aside id="detail-panel" aria-label="Passage details">
+                    <h3>Passage details</h3>
+                    <p class="detail-placeholder">Select a point to read its passage, document hierarchy, and five nearest semantic neighbors.</p>
+                </aside>
+            </div>
+            <div id="topic-legend" class="lab8-topic-legend" aria-label="Semantic topic colors"></div>
+        </section>
+
+        <section class="visualization-card" aria-labelledby="matrix-heading">
+            <h2 id="matrix-heading">Topics across bulletin sections</h2>
+            <p class="lab8-help">Rows follow the bulletin's formal sections; columns show semantic topics. Click a nonempty cell to filter the map. Selecting a passage outlines its cell.</p>
+            <div class="matrix-key"><span>Fewer</span><i></i><span>More passages</span><span>Logarithmic color scale · exact counts in cells</span></div>
+            <div class="lab8-matrix-scroll" tabindex="0" role="region" aria-label="Topic by section matrix; scroll to explore all sections"><table id="topic-matrix"><caption class="visually-hidden">Passage counts by formal section and semantic topic</caption></table></div>
+        </section>
+
+        <section class="design-card lab8-findings" aria-labelledby="findings-heading">
+            <h2 id="findings-heading">What the bulletin shows</h2>
+            <ol>
+                <li><h3>What are the major topics?</h3><p>The eight clusters separate arts and media, Chinese language and culture, credit and study pathways, registration and academic standing, history and society, science and computing, learning and student support, and health and public policy. Science and computing is the largest group (166 passages), followed by registration and academic standing (161). The groups are broad: a course can discuss several ideas even though K-means assigns it one label.</p></li>
+                <li><h3>Which topics cross formal boundaries?</h3><p>Credit and study pathways appears in 46 sections, registration and academic standing in 40, and learning and student support in 29. These subjects recur throughout the bulletin rather than belonging to one chapter. Searching for “credit” finds 127 passages across seven topics, with most in the two policy-related groups. A shared word therefore does not guarantee the same context.</p></li>
+                <li><h3>Which sections are most diverse?</h3><p>Among sections with at least ten passages, Course Descriptions and Majors are the most semantically diverse. Course Descriptions contains all eight topics across 597 passages; Majors contains seven across 74. Their topic entropies are 2.62 and 2.60 bits, respectively, compared with a maximum of 3 bits for eight equally represented topics. The matrix shows why: these sections spread across subject areas, while many administrative sections concentrate on one or two topics.</p></li>
+                <li><h3>Where do different sections discuss similar ideas?</h3><p><a href="#semantic-map" class="passage-reference" data-passage="p0303">Study Away, page 75 (p0303)</a> and <a href="#semantic-map" class="passage-reference" data-passage="p0128">Transfer of Work Taken Elsewhere, page 39 (p0128)</a> both describe limits on transfer credits and restrictions during leave or suspension. Their embedding cosine similarity is 0.923. The first presents the rules in a study-away context, while the second gives the wider transfer-credit policy. Their connection is clearer through the neighbor list than through their distant page numbers.</p></li>
+            </ol>
+        </section>
+
+        <section class="design-card" aria-labelledby="design-heading">
+            <h2 id="design-heading">Design description</h2>
+            <div id="design-description">
+                <p>I treated a paragraph or short policy block as one passage. PDF bookmarks supply the chapter, section, and subsection, while text positions preserve the page range. Cleaning joins wrapped lines and cross-page continuations, removes exact duplicates, and excludes short fragments, footnotes, and table rows. This leaves a prose corpus rather than a transcription of every item in the bulletin.</p>
+                <p>I used all-MiniLM-L6-v2 to produce normalized, 384-dimensional embeddings. Long passages are divided into 220-token windows; their vectors are averaged by token count and normalized again. UMAP uses cosine distance, 15 neighbors, a minimum distance of 0.15, and seed 401. Eight K-means clusters are fitted to the original vectors with 20 initializations and the same seed. Topic names come from representative passages and their characteristic TF-IDF terms.</p>
+                <p>Map position represents the UMAP projection, color identifies topic, and circle size shows passage length. Search highlights matching passages, and section and topic filters reduce the visible set. Clicking a point keeps the original passage and its hierarchy in the detail panel. Its five neighbors are ranked by cosine similarity in the original embedding space, not by distance on the screen.</p>
+                <p>The matrix counts passages in each section and topic. Clicking a cell filters the map; selecting a point outlines its cell. A logarithmic color scale keeps small counts visible beside Course Descriptions. The findings show that policy themes cross section boundaries, while course descriptions cover many subjects. These clusters are interpretive groupings with overlap, and the two-dimensional projection should not be read as an exact semantic map.</p>
+            </div>
+            <p class="chart-note"><a href="prepare_bulletin.py">Preparation script</a> · <a href="requirements.txt">Python requirements</a> · <a href="../data/lab8_embedding_map.csv">Passage data</a> · <a href="../data/lab8_analysis.json">Model settings and corpus statistics</a></p>
+        </section>
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+    <div id="lab8-tooltip" role="tooltip" hidden></div>
 </body>
 </html>
