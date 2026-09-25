@@ -1,15 +1,15 @@
-# Data Breaches, Reassembled
+# Data Breaches, Compared
 
 STATS 401 · Visualization Critique and Redesign · Teresa Tu
 
 ## Deliverables
 
-- [Interactive project and 707-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
+- [Interactive project and 692-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
 - [One-page presentation PDF](assets/Teresa_Tu.pdf)
 - [One-minute speaking script](presentation-notes.md)
 - [Source data and cleaning audit](data/README.md)
 
-The static page uses locally pinned D3.js v7.9.0 and loads `data/breaches.json` externally. It offers industry, cause, and logarithmic-scale views, animated regrouping, search, reporting-year playback, and event details with original sources. Screenshots are labeled excerpts of the original visualization and implemented redesign.
+The static page uses locally pinned D3.js v7.9.0 and loads `data/breaches.json` externally. It presents a zero-based linear ranking with ten named events per page, printed counts, industry/cause filters, search, category count bars, and event details with original sources. The bar scale stays fixed across pages within a filter selection and rescales explicitly when the selection changes. Entries without comparable numeric counts appear in a separate expandable list. Screenshots are labeled excerpts of the original visualization and implemented redesign.
 
 ## Run locally
 

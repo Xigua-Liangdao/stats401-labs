@@ -1,329 +1,180 @@
-/* Data Breaches, Reassembled — Teresa Tu, STATS 401.
- * D3 7.9.0, external JSON, stable event IDs. Equal-size marks in all views.
- * Cluster and beeswarm layouts are deterministic. Scale x positions are never
- * jittered: displacement in y only prevents overlap and has no quantitative meaning.
- */
+/* Data Breaches, Compared — D3 7.9.0, external frozen JSON.
+   A linear, zero-based ranking with persistent event IDs and printed values. */
 (() => {
   'use strict';
-  const $ = (id) => document.getElementById(id);
-  const svg = d3.select('#breach-chart');
-  const stage = $('chart-stage');
-  const background = svg.append('g').attr('class', 'layout-background');
-  const marks = svg.append('g').attr('class', 'event-marks');
-  const selectedLayer = svg.append('g').attr('class', 'selected-layer');
-  const tooltip = document.createElement('div');
-  tooltip.className = 'chart-tooltip';
-  tooltip.hidden = true;
-  stage.appendChild(tooltip);
-  const palette = ['#0072B2', '#D55E00', '#009E73', '#A5689B', '#C98D00', '#7C8C88'];
-  const state = { events: [], filtered: [], layout: 'sector', year: 2026, search: '', selected: null, playing: false, timer: null, width: 0, sectors: [], methods: [], scaleCache: null };
-  const RADIUS = 4.15;
-  const GAP = 1.85;
-  const DISTANCE = RADIUS * 2 + GAP;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const formatExact = d3.format(',');
-  const compact = (n) => n >= 1e9 ? `${d3.format('.3~g')(n / 1e9)}B` : n >= 1e6 ? `${d3.format('.3~g')(n / 1e6)}M` : n >= 1e3 ? `${d3.format('.3~g')(n / 1e3)}k` : formatExact(n);
-  const color = (d) => palette[state.sectors.indexOf(d.displaySector)] || palette[5];
-  const safeUrl = (value) => { try { const url = new URL(value); return /^(https?:)$/.test(url.protocol) ? url.href : null; } catch { return null; } };
-  const countText = (d) => d.records === null ? (d.recordsLabel || 'No comparable count') : `${d.recordsStatus === 'approximate' ? '≈ ' : ''}${formatExact(d.records)}`;
-  const visibleEvents = () => state.events.filter((d) => d.year <= state.year && (!state.search || d.searchText.includes(state.search)));
-  const announce = (message) => { $('live-status').textContent = message; };
-  function stopPlayback() {
-    clearInterval(state.timer); state.timer = null; state.playing = false;
-    $('play-button').innerHTML = '<span aria-hidden="true">▶</span> Play years';
-    $('play-button').setAttribute('aria-label', 'Play through disclosure years');
+  const $ = id => document.getElementById(id);
+  const PAGE_SIZE = 10;
+  const state = { events: [], filtered: [], numeric: [], unranked: [], page: 0, selected: null, sector: '', method: '', search: '' };
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const exact = d3.format(',');
+  const compact = n => n >= 1e9 ? `${d3.format('.3~g')(n / 1e9)}B` : n >= 1e6 ? `${d3.format('.3~g')(n / 1e6)}M` : n >= 1e3 ? `${d3.format('.3~g')(n / 1e3)}k` : exact(n);
+  const count = d => d.records === null ? d.recordsLabel : `${d.recordsStatus === 'approximate' ? '≈ ' : ''}${exact(d.records)}`;
+  const brief = d => `${d.recordsStatus === 'approximate' ? '≈ ' : ''}${compact(d.records)}`;
+  const safeUrl = value => { try { const u = new URL(value); return /^https?:$/.test(u.protocol) ? u.href : null; } catch { return null; } };
+  const svg = d3.select('#rank-chart');
+  svg.select('title').attr('id', 'rank-svg-title');
+  svg.select('desc').attr('id', 'rank-svg-description');
+  const grid = svg.append('g').attr('class', 'rank-grid');
+  const axis = svg.append('g').attr('class', 'rank-axis');
+  const rows = svg.append('g').attr('class', 'rank-rows');
+  let resizeTimer, lastWidth = 0;
+
+  function matches(d) {
+    return (!state.sector || d.sector === state.sector) && (!state.method || d.method === state.method) && (!state.search || d.searchText.includes(state.search));
   }
-  function playback() {
-    if (state.playing) { stopPlayback(); return; }
-    if (state.year >= state.maxYear) state.year = state.minYear;
-    state.playing = true;
-    $('play-button').innerHTML = '<span aria-hidden="true">Ⅱ</span> Pause';
-    $('play-button').setAttribute('aria-label', 'Pause disclosure-year playback');
-    update();
-    state.timer = setInterval(() => {
-      if (state.year >= state.maxYear) { stopPlayback(); announce(`Playback complete. All years through ${state.maxYear} are shown.`); return; }
-      state.year += 1; update();
-      if (state.year >= state.maxYear) { stopPlayback(); announce(`Playback complete. All years through ${state.maxYear} are shown.`); }
-    }, 1150);
+  function node(tag, cls, text, parent) {
+    const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; if (parent) parent.appendChild(n); return n;
   }
-  function addText(parent, text, x, y, cls, attrs = {}) {
-    const el = parent.append('text').attr('x', x).attr('y', y).attr('class', cls).text(text);
-    Object.entries(attrs).forEach(([key, value]) => el.attr(key, value));
-    return el;
-  }
-  function packPoints(n, usableWidth) {
-    if (!n) return [];
-    const halfColumns = Math.max(1, Math.floor((usableWidth / 2 - RADIUS) / DISTANCE));
-    const rowLimit = Math.max(3, Math.ceil(n / (halfColumns * 2)) + 3);
-    const candidates = [];
-    for (let row = -rowLimit; row <= rowLimit; row += 1) {
-      for (let col = -halfColumns; col <= halfColumns; col += 1) {
-        const x = (col + (Math.abs(row) % 2) * .5) * DISTANCE;
-        const y = row * DISTANCE * Math.sqrt(3) / 2;
-        if (Math.abs(x) + RADIUS <= usableWidth / 2) candidates.push({ x, y, distance: x * x + y * y });
-      }
+  function wrap(text, max) {
+    const result = []; let line = '';
+    for (const word of text.split(/\s+/)) {
+      if (line && (line.length + word.length + 1) > max) { result.push(line); line = ''; }
+      if (word.length > max) {
+        if (line) { result.push(line); line = ''; }
+        for (let k = 0; k < word.length; k += max) result.push(word.slice(k, k + max));
+      } else line += (line ? ' ' : '') + word;
     }
-    return candidates.sort((a, b) => a.distance - b.distance || a.y - b.y || a.x - b.x).slice(0, n);
+    if (line) result.push(line);
+    return result.length ? result : ['Unnamed event'];
   }
-  function clusterLayout(data, key, groups, width) {
-    const columns = width >= 660 ? 3 : width >= 390 ? 2 : 1;
-    const gutter = 12;
-    const cardWidth = (width - (columns - 1) * gutter) / columns;
-    const plans = groups.map((group) => {
-      const events = data.filter((d) => d[key] === group).sort((a, b) => d3.ascending(a.id, b.id));
-      const offsets = packPoints(events.length, cardWidth - 30);
-      const halfHeight = d3.max(offsets, (p) => Math.abs(p.y)) || 0;
-      return { group, events, offsets, halfHeight, naturalHeight: Math.max(154, halfHeight * 2 + 87) };
-    });
-    const positions = new Map();
-    let currentY = 0;
-    for (let start = 0; start < plans.length; start += columns) {
-      const row = plans.slice(start, start + columns);
-      const rowHeight = d3.max(row, (p) => p.naturalHeight);
-      row.forEach((plan, column) => {
-        const left = column * (cardWidth + gutter);
-        const card = background.append('g');
-        card.append('rect').attr('class', 'chart-group-box').attr('x', left).attr('y', currentY).attr('width', cardWidth).attr('height', rowHeight).attr('rx', 7);
-        addText(card, plan.group, left + 13, currentY + 22, 'chart-group-label');
-        addText(card, `${plan.events.length} event${plan.events.length === 1 ? '' : 's'}`, left + 13, currentY + 39, 'chart-group-count');
-        const centerY = currentY + 48 + (rowHeight - 59) / 2;
-        plan.events.forEach((event, i) => positions.set(event.id, { x: left + cardWidth / 2 + plan.offsets[i].x, y: centerY + plan.offsets[i].y }));
-        if (!plan.events.length) addText(card, 'No matching events', left + cardWidth / 2, centerY + 4, 'chart-group-count', { 'text-anchor': 'middle' });
-      });
-      currentY += rowHeight + gutter;
-    }
-    return { positions, height: Math.max(180, currentY - gutter) };
-  }
-  function swarm(events, scale) {
-    const placed = [];
-    const d2 = DISTANCE * DISTANCE;
-    events.slice().sort((a, b) => d3.ascending(a.records, b.records) || d3.ascending(a.id, b.id)).forEach((event) => {
-      const x = scale(event.records);
-      const nearby = placed.filter((point) => Math.abs(point.x - x) < DISTANCE);
-      const candidates = [0];
-      nearby.forEach((point) => {
-        const dy = Math.sqrt(Math.max(0, d2 - (point.x - x) ** 2)) + .02;
-        candidates.push(point.y + dy, point.y - dy);
-      });
-      candidates.sort((a, b) => Math.abs(a) - Math.abs(b) || a - b);
-      const y = candidates.find((candidate) => nearby.every((point) => (point.x - x) ** 2 + (point.y - candidate) ** 2 >= d2 - .001)) ?? 0;
-      placed.push({ id: event.id, x, y });
-    });
-    return placed;
-  }
-  function scaleLayout(width) {
-    if (state.scaleCache?.width === width) return state.scaleCache;
-    const narrow = width < 500;
-    const margin = { left: 10, right: 6, top: 64, bottom: 28 };
-    const unknownWidth = narrow ? 67 : 89;
-    const plotRight = width - unknownWidth - 19;
-    const knownValues = state.events.filter((d) => d.records !== null).map((d) => d.records);
-    const extent = d3.extent(knownValues);
-    const lowExponent = Math.floor(Math.log10(extent[0]));
-    const highExponent = Math.ceil(Math.log10(extent[1]));
-    const x = d3.scaleLog().domain([10 ** lowExponent, 10 ** highExponent]).range([margin.left + 2, plotRight - 8]);
-    const plans = state.sectors.map((sector) => {
-      const events = state.events.filter((d) => d.displaySector === sector);
-      const known = swarm(events.filter((d) => d.records !== null), x);
-      const unknownEvents = events.filter((d) => d.records === null);
-      const unknownOffsets = packPoints(unknownEvents.length, unknownWidth - 12);
-      const unknown = unknownEvents.map((d, i) => ({ id: d.id, x: width - unknownWidth / 2, y: unknownOffsets[i].y, dx: unknownOffsets[i].x }));
-      const halfHeight = Math.max(12, d3.max(known, (p) => Math.abs(p.y)) || 0, d3.max(unknown, (p) => Math.abs(p.y)) || 0);
-      return { sector, known, unknown, height: halfHeight * 2 + 54, halfHeight };
-    });
-    const positions = new Map();
-    let currentY = margin.top;
-    plans.forEach((plan) => {
-      plan.top = currentY;
-      const center = currentY + 29 + plan.halfHeight;
-      plan.known.forEach((p) => positions.set(p.id, { x: p.x, y: center + p.y }));
-      plan.unknown.forEach((p) => positions.set(p.id, { x: p.x + p.dx, y: center + p.y }));
-      currentY += plan.height;
-    });
-    state.scaleCache = { width, positions, plans, x, plotRight, unknownWidth, lowExponent, highExponent, height: currentY + margin.bottom };
-    return state.scaleCache;
-  }
-  function drawScale(layout, data) {
-    const { x, plotRight, unknownWidth, width, lowExponent, highExponent, height, plans } = layout;
-    background.append('rect').attr('class', 'unknown-band').attr('x', width - unknownWidth).attr('y', 0).attr('width', unknownWidth).attr('height', height - 12).attr('rx', 5);
-    addText(background, 'REPORTED RECORDS · LOG SCALE', 10, 12, 'scale-axis-label');
-    addText(background, '10× per step', 10, 27, 'scale-axis-label');
-    addText(background, 'No comparable', width - unknownWidth / 2, 15, 'scale-axis-label', { 'text-anchor': 'middle' });
-    addText(background, 'record count', width - unknownWidth / 2, 29, 'scale-axis-label', { 'text-anchor': 'middle' });
-    const ticks = d3.range(lowExponent, highExponent + 1).map((p) => 10 ** p);
-    const showTicks = ticks;
-    const axis = d3.axisTop(x).tickValues(showTicks).tickFormat(compact).tickSize(4).tickPadding(4);
-    background.append('g').attr('class', 'scale-axis').attr('transform', 'translate(0,53)').call(axis);
-    const grid = background.append('g').attr('class', 'scale-grid');
-    ticks.forEach((tick) => grid.append('line').attr('x1', x(tick)).attr('x2', x(tick)).attr('y1', 59).attr('y2', height - 26));
-    plans.forEach((plan) => {
-      const count = data.filter((d) => d.displaySector === plan.sector).length;
-      background.append('line').attr('class', 'scale-lane-rule').attr('x1', 0).attr('x2', width).attr('y1', plan.top).attr('y2', plan.top);
-      addText(background, `${plan.sector}  ·  ${count}`, 10, plan.top + 16, 'chart-group-label');
-    });
-  }
-  function showTooltip(event, d) {
-    tooltip.replaceChildren();
-    const title = document.createElement('strong'); title.textContent = d.organization; tooltip.appendChild(title);
-    const details = document.createElement('div'); details.textContent = `${d.year} · ${countText(d)}${d.records !== null ? ' records' : ''}`; tooltip.appendChild(details);
-    const hint = document.createElement('div'); hint.textContent = 'Click to inspect'; hint.className = 'tip-small'; tooltip.appendChild(hint);
-    tooltip.hidden = false;
-    moveTooltip(event);
-  }
-  function moveTooltip(event) {
-    const rect = stage.getBoundingClientRect();
-    const maxLeft = Math.max(0, rect.width - tooltip.offsetWidth - 8);
-    tooltip.style.left = `${Math.min(maxLeft, Math.max(0, event.clientX - rect.left + 13))}px`;
-    tooltip.style.top = `${Math.max(0, event.clientY - rect.top - tooltip.offsetHeight - 10)}px`;
-  }
-  function selectEvent(id, shouldAnnounce = true) {
-    state.selected = id || null;
-    $('event-select').value = state.selected || '';
-    renderDetail(); renderSelection();
-    if (shouldAnnounce && id) { const event = state.events.find((d) => d.id === id); announce(`${event.organization}, ${event.year}, ${countText(event)}. Details shown beside the chart.`); }
+  function selectEvent(d) {
+    state.selected = d.id;
+    renderDetail();
+    rows.selectAll('.rank-row').classed('is-selected', e => e.id === d.id).attr('aria-pressed', e => e.id === d.id);
+    rows.selectAll('.rank-bar').attr('fill', e => e.id === d.id ? '#c75b37' : '#257b78');
+    document.querySelectorAll('.unranked-event').forEach(el => el.setAttribute('aria-pressed', el.dataset.eventId === d.id));
+    $('live-status').textContent = `${d.organization}, ${d.year}. ${count(d)}${d.records !== null ? ' reported records' : ''}. Source details updated below the chart.`;
   }
   function renderDetail() {
-    const panel = $('event-detail');
-    const event = state.events.find((d) => d.id === state.selected);
-    if (!event) {
-      panel.innerHTML = '<div class="detail-empty"><span class="detail-crosshair" aria-hidden="true">⊕</span><h3 id="detail-heading">Every event has a story.</h3><p>Click a dot or choose an event above to see its reported scale, background, and source.</p><p class="detail-tip">Try each layout to follow the selected event as it moves.</p></div>';
-      return;
-    }
-    panel.replaceChildren();
-    const el = (tag, cls, text) => { const node = document.createElement(tag); if (cls) node.className = cls; if (text) node.textContent = text; panel.appendChild(node); return node; };
-    el('p', 'event-meta', `Disclosure year · ${event.year}`);
-    const heading = el('h3', '', event.organization); heading.id = 'detail-heading';
-    el('p', 'detail-number', countText(event));
-    el('p', 'detail-number-label', event.records === null ? 'No reliable numeric position assigned' : `${event.recordsStatus === 'approximate' ? 'Approximate' : 'Reported'} records affected`);
-    const tags = el('div', 'detail-tags');
-    [event.sector, event.method].forEach((value) => { const span = document.createElement('span'); span.textContent = value; tags.appendChild(span); });
-    el('p', 'detail-source-fields', `Source industry: ${event.sectorRaw || event.sector}. Source cause: ${event.methodRaw || event.method}.`);
-    if (event.recordsNote) el('p', 'detail-caveat', event.recordsNote);
-    else if (event.records === null) el('p', 'detail-caveat', 'The source does not establish a reliable numeric count. This event remains visible in a separate column.');
-    el('p', 'detail-story', event.story || 'No additional narrative was supplied in the source spreadsheet.');
-    const sources = el('div', 'detail-sources', 'Event sources');
-    let safeSources = 0;
-    (event.sources || []).forEach((source, i) => {
-      const href = safeUrl(source.url); if (!href) return;
-      const link = document.createElement('a'); link.href = href; link.textContent = `${source.name || `Source ${i + 1}`} ↗`; link.target = '_blank'; link.rel = 'noopener noreferrer'; sources.appendChild(link); safeSources += 1;
+    const target = $('selection-detail'); target.replaceChildren();
+    const d = state.filtered.find(e => e.id === state.selected);
+    if (!d) { node('p', 'detail-kicker', 'EVENT DETAILS', target); node('h3', 'detail-heading', 'Select a named row to read its source.', target); return; }
+    node('p', 'detail-kicker', `SELECTED EVENT · REPORTED ${d.year}`, target);
+    const top = node('div', 'detail-top', undefined, target);
+    node('h3', 'detail-heading', d.organization, top);
+    node('p', 'detail-value', `${count(d)}${d.records !== null ? ' reported records' : ''}`, top);
+    node('p', 'detail-meta', `${d.sector} · ${d.method}`, target);
+    if (d.recordsNote) node('p', 'detail-caveat', d.recordsNote, target);
+    node('p', 'detail-story', d.story || 'No event narrative was supplied in the source spreadsheet.', target);
+    const links = node('div', 'detail-sources', undefined, target);
+    node('span', '', 'Source: ', links);
+    let total = 0;
+    (d.sources || []).forEach((s, i) => { const url = safeUrl(s.url); if (!url) return; const a = node('a', '', `${s.name || `Article ${i + 1}`} ↗`, links); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; total++; });
+    if (!total) node('span', '', 'No article link supplied; see the source spreadsheet.', links);
+    node('p', 'detail-raw', `Original classifications: ${d.sectorRaw || d.sector} / ${d.methodRaw || d.method}. Reporting year is the source's “year story broke”.`, target);
+  }
+  function renderRanking() {
+    const w = Math.max(260, Math.floor($('rank-stage').clientWidth)); lastWidth = w;
+    const narrow = w < 650;
+    const left = narrow ? 0 : Math.min(270, Math.max(212, Math.round(w * .26)));
+    const right = narrow ? 10 : 144;
+    const plotWidth = Math.max(80, w - left - right);
+    const max = d3.max(state.numeric, d => d.records) || 1;
+    const x = d3.scaleLinear().domain([0, max]).nice(4).range([left, left + plotWidth]);
+    const page = state.numeric.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE);
+    let y = 50;
+    const data = page.map((d, i) => {
+      const maxChars = narrow ? Math.max(17, Math.floor((w - 115) / 6.5)) : Math.floor((left - 48) / 7.1);
+      const lines = wrap(d.organization, maxChars);
+      const height = narrow ? Math.max(75, lines.length * 17 + 50) : Math.max(57, lines.length * 17 + 26);
+      const row = { ...d, lines, y, height, rank: state.page * PAGE_SIZE + i + 1 }; y += height; return row;
     });
-    if (!safeSources) { const note = document.createElement('p'); note.textContent = 'No article URL is supplied for this source row; see the dataset spreadsheet.'; sources.appendChild(note); }
-  }
-  function renderSelection() {
-    marks.selectAll('circle.chart-dot').classed('is-selected', (d) => d.id === state.selected).attr('opacity', (d) => !state.selected || d.id === state.selected ? 1 : .62);
-    selectedLayer.selectAll('*').remove();
-    const selected = state.filtered.find((d) => d.id === state.selected);
-    if (!selected || !state.currentPositions) return;
-    const point = state.currentPositions.get(selected.id);
-    if (!point) return;
-    const group = selectedLayer.append('g').attr('transform', `translate(${point.x},${point.y})`);
-    group.append('circle').attr('class', 'selection-halo').attr('r', RADIUS + 4);
-    const label = selected.organization.length > 27 ? `${selected.organization.slice(0, 26)}…` : selected.organization;
-    const anchor = point.x > state.width * .7 ? 'end' : 'start';
-    addText(group, label, anchor === 'end' ? -10 : 10, -12, 'selected-caption', { 'text-anchor': anchor });
-  }
-  function renderDropdown() {
-    const select = $('event-select');
-    const previous = state.selected;
-    select.replaceChildren();
-    const prompt = document.createElement('option'); prompt.value = ''; prompt.textContent = state.filtered.length ? `Choose from ${state.filtered.length} events…` : 'No matching events'; select.appendChild(prompt);
-    state.filtered.slice().sort((a, b) => d3.ascending(a.organization.toLowerCase(), b.organization.toLowerCase()) || a.year - b.year).forEach((d) => {
-      const option = document.createElement('option'); option.value = d.id; option.textContent = `${d.organization} (${d.year}) — ${d.records === null ? (d.recordsLabel || 'no comparable count') : compact(d.records)}`; select.appendChild(option);
+    const h = page.length ? y + 9 : 70;
+    svg.style('display', page.length ? null : 'none').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'group').attr('aria-labelledby', 'rank-svg-title rank-svg-description');
+    svg.select('#rank-svg-title').text(`Reported breach sizes, ranks ${state.page * 10 + 1}–${state.page * 10 + page.length} of ${state.numeric.length}`);
+    svg.select('#rank-svg-description').text('Horizontal bar lengths show source-reported records on a linear axis starting at zero. Each row prints its organization, reporting year, and value. Activate a row to show its sources below.');
+    axis.attr('transform', 'translate(0,32)').call(d3.axisTop(x).ticks(narrow ? 3 : 4).tickSize(0).tickPadding(9).tickFormat(compact));
+    axis.select('.domain').attr('stroke', '#aabbb7');
+    axis.selectAll('text').attr('fill', '#526561').attr('font-size', narrow ? 10 : 11);
+    grid.selectAll('line').data(x.ticks(narrow ? 3 : 4)).join('line').attr('x1', d => x(d)).attr('x2', d => x(d)).attr('y1', 36).attr('y2', h).attr('stroke', '#e2e8e2').attr('stroke-dasharray', d => d === 0 ? null : '2 4');
+    const join = rows.selectAll('g.rank-row').data(data, d => d.id);
+    join.exit().interrupt().remove();
+    const enter = join.enter().append('g').attr('class', 'rank-row').attr('tabindex', 0).attr('role', 'button').attr('transform', d => `translate(0,${d.y})`);
+    enter.append('rect').attr('class', 'rank-hit');
+    enter.append('line').attr('class', 'rank-rule');
+    enter.append('text').attr('class', 'rank-index');
+    enter.append('text').attr('class', 'rank-name');
+    enter.append('text').attr('class', 'rank-meta');
+    enter.append('rect').attr('class', 'rank-bar').attr('width', 0).attr('rx', 2);
+    enter.append('text').attr('class', 'rank-value');
+    const merged = enter.merge(join).order().attr('aria-label', d => `Rank ${d.rank}. ${d.organization}, ${d.year}. ${count(d)} reported records. Read source details.`).attr('aria-pressed', d => d.id === state.selected).classed('is-selected', d => d.id === state.selected)
+      .on('click', (_, d) => selectEvent(d)).on('keydown', (event, d) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectEvent(d); } });
+    merged.interrupt().transition().duration(motion.matches ? 0 : 380).attr('transform', d => `translate(0,${d.y})`);
+    merged.select('.rank-hit').attr('x', 0).attr('y', -4).attr('width', w).attr('height', d => d.height - 2).attr('fill', 'transparent').attr('rx', 4);
+    merged.select('.rank-rule').attr('x1', 0).attr('x2', w).attr('y1', d => d.height - 4).attr('y2', d => d.height - 4).attr('stroke', '#e3e7e0');
+    merged.select('.rank-index').attr('x', 0).attr('y', 16).attr('fill', '#7c8c88').attr('font-size', 11).text(d => String(d.rank).padStart(2, '0'));
+    merged.select('.rank-name').attr('x', 29).attr('y', 16).attr('fill', '#19332f').attr('font-size', narrow ? 12 : 14).attr('font-weight', 650).each(function (d) {
+      d3.select(this).selectAll('tspan').data(d.lines).join('tspan').attr('x', 29).attr('dy', (_, i) => i ? 17 : 0).text(t => t);
     });
-    select.disabled = state.filtered.length === 0;
-    if (previous && state.filtered.some((d) => d.id === previous)) select.value = previous;
-    else if (previous) { state.selected = null; renderDetail(); }
+    merged.select('.rank-meta').attr('x', 29).attr('y', d => d.lines.length * 17 + 15).attr('fill', '#71807b').attr('font-size', 10).text(d => narrow ? `${d.year}` : `${d.year} · ${d.sector}`);
+    merged.select('.rank-bar').attr('x', x(0)).attr('y', d => narrow ? d.lines.length * 17 + 27 : Math.round((d.height - 24) / 2) - 1).attr('height', narrow ? 12 : 22).attr('fill', d => d.id === state.selected ? '#c75b37' : '#257b78').interrupt().transition().duration(motion.matches ? 0 : 450).attr('width', d => x(d.records) - x(0));
+    merged.select('.rank-value').attr('x', w - 3).attr('y', d => narrow ? 17 : Math.round(d.height / 2) + 3).attr('text-anchor', 'end').attr('fill', '#19332f').attr('font-size', narrow ? 10 : 13).attr('font-weight', 700).text(count);
+    $('empty-state').hidden = page.length > 0;
+    $('empty-state').textContent = state.filtered.length ? 'No comparable numeric counts in this selection. The named events are listed below.' : 'No events match. Try another name or reset the filters.';
+    $('rank-stage').classList.toggle('is-empty', page.length === 0);
+    $('prev-page').disabled = state.page === 0;
+    $('next-page').disabled = (state.page + 1) * PAGE_SIZE >= state.numeric.length;
+    $('page-status').textContent = page.length ? `Showing ${state.page * 10 + 1}–${state.page * 10 + page.length} of ${state.numeric.length} ranked events` : 'No ranked events';
   }
-  function update({ resize = false } = {}) {
-    if (!state.events.length) return;
-    tooltip.hidden = true;
-    state.filtered = visibleEvents();
-    const width = Math.max(220, Math.floor(stage.clientWidth)); state.width = width;
-    $('year-slider').value = state.year; $('year-label').value = state.year;
-    $('event-count').textContent = state.filtered.length;
-    $('count-label').textContent = `${state.filtered.length === state.events.length ? '' : `of ${state.events.length} `}events shown`;
-    const descriptions = {
-      sector: ['Which industries appear?', 'Events grouped by industry; each dot has equal visual weight.', 'Position within a group has no data meaning.'],
-      method: ['How were records exposed?', 'Events regroup by cause; industry colors remain unchanged.', 'Cause follows the source classification, not an independent forensic finding.'],
-      scale: ['How large were the reported breaches?', 'Compare horizontal position; each labeled power-of-ten step represents 10× records.', 'Only horizontal position encodes scale. Vertical offsets prevent overlap.']
+  function renderSummary(key, targetId) {
+    const container = $(targetId); container.replaceChildren();
+    const groups = d3.rollups(state.filtered, v => v.length, d => d[key]).sort((a, b) => d3.descending(a[1], b[1]) || d3.ascending(a[0], b[0]));
+    if (!groups.length) { node('p', 'summary-empty', 'No matching events.', container); return; }
+    const max = groups[0][1];
+    const makeButton = ([label, n], parent) => {
+      const btn = node('button', 'summary-row', undefined, parent); btn.type = 'button'; btn.setAttribute('aria-pressed', state[key] === label); btn.setAttribute('aria-label', `Filter ${key === 'sector' ? 'industry' : 'cause'}: ${label}, ${n} events`);
+      const line = node('span', 'summary-line', undefined, btn);
+      node('span', 'summary-label', label, line); node('span', 'summary-count', String(n), line);
+      const track = node('span', 'summary-track', undefined, btn); const fill = node('span', 'summary-fill', undefined, track); fill.style.width = `${n / max * 100}%`;
+      btn.addEventListener('click', () => { state[key] = state[key] === label ? '' : label; $(key === 'sector' ? 'sector-filter' : 'method-filter').value = state[key]; update(true); $('ranking-title').scrollIntoView({ behavior: motion.matches ? 'auto' : 'smooth', block: 'start' }); });
     };
-    const [title, description, footnote] = descriptions[state.layout];
-    $('view-title').textContent = title; $('view-description').textContent = description; $('position-note').textContent = footnote;
-    $('chart-svg-title').textContent = `${title} ${state.filtered.length} events through ${state.year}.`;
-    $('chart-svg-description').textContent = `${description} ${footnote} Colors indicate industry. Select any visible event with the dropdown for its exact value and source. Unknown, unresolved, and incomparable counts remain visible.`;
-    document.querySelectorAll('[data-layout]').forEach((button) => button.setAttribute('aria-pressed', button.dataset.layout === state.layout));
-    background.selectAll('*').remove(); selectedLayer.selectAll('*').remove();
-    const layout = state.layout === 'scale' ? scaleLayout(width) : clusterLayout(state.filtered, state.layout === 'sector' ? 'displaySector' : 'method', state.layout === 'sector' ? state.sectors : state.methods, width);
-    if (state.layout === 'scale') drawScale(layout, state.filtered);
-    state.currentPositions = layout.positions;
-    svg.attr('viewBox', `0 0 ${width} ${layout.height}`).attr('height', layout.height);
-    const duration = prefersReducedMotion.matches || resize ? 0 : 760;
-    const transition = svg.transition('layout').duration(duration).ease(d3.easeCubicInOut);
-    const dots = marks.selectAll('circle.chart-dot').data(state.filtered, (d) => d.id);
-    dots.exit().interrupt('layout').transition('layout').duration(duration ? 210 : 0).attr('r', 0).attr('opacity', 0).remove();
-    const enter = dots.enter().append('circle').attr('class', 'chart-dot').attr('r', 0)
-      .attr('cx', width / 2).attr('cy', layout.height / 2).attr('fill', color)
-      .on('pointerenter', showTooltip).on('pointermove', moveTooltip).on('pointerleave', () => { tooltip.hidden = true; })
-      .on('click', (_, d) => { stopPlayback(); selectEvent(d.id); });
-    enter.append('title');
-    const merged = enter.merge(dots);
-    merged.select('title').text((d) => `${d.organization} (${d.year}) — ${countText(d)}${d.records !== null ? ' records' : ''}`);
-    merged.interrupt('layout').transition(transition)
-      .attr('cx', (d) => layout.positions.get(d.id).x).attr('cy', (d) => layout.positions.get(d.id).y)
-      .attr('r', RADIUS).attr('fill', color).attr('opacity', (d) => !state.selected || d.id === state.selected ? 1 : .62);
-    renderDropdown();
-    if (duration) { transition.on('end.selection', renderSelection); }
-    else renderSelection();
-    $('chart-status').hidden = state.filtered.length > 0;
-    $('chart-status').textContent = 'No events match these filters. Try another name, a later year, or Reset all.';
-    if (!state.playing) announce(`${state.filtered.length} of ${state.events.length} events shown through ${state.year}. ${title}`);
+    groups.slice(0, 5).forEach(g => makeButton(g, container));
+    if (groups.length > 5) { const more = node('details', 'summary-more', undefined, container); node('summary', '', `Show ${groups.length - 5} more ${key === 'sector' ? (groups.length === 6 ? 'industry' : 'industries') : (groups.length === 6 ? 'cause' : 'causes')}`, more); groups.slice(5).forEach(g => makeButton(g, more)); }
   }
-  function bindEvents() {
-    document.querySelectorAll('[data-layout]').forEach((button) => button.addEventListener('click', () => { state.layout = button.dataset.layout; update(); }));
-    $('search').addEventListener('input', (event) => { stopPlayback(); state.search = event.target.value.trim().toLocaleLowerCase(); update(); });
-    $('year-slider').addEventListener('input', (event) => { stopPlayback(); state.year = Number(event.target.value); update(); });
-    $('play-button').addEventListener('click', playback);
-    $('reset-button').addEventListener('click', () => { stopPlayback(); state.year = state.maxYear; state.search = ''; state.selected = null; $('search').value = ''; renderDetail(); update(); });
-    $('event-select').addEventListener('change', (event) => { stopPlayback(); selectEvent(event.target.value); });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stopPlayback(); });
-    let resizeTimer;
-    new ResizeObserver(() => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (Math.floor(stage.clientWidth) !== state.width) update({ resize: true }); }, 100); }).observe(stage);
+  function renderUnranked() {
+    $('unranked-title').textContent = `${state.unranked.length} matching event${state.unranked.length === 1 ? '' : 's'} without a comparable record count`;
+    const list = $('unranked-list'); list.replaceChildren();
+    if (!state.unranked.length) { node('p', '', 'Every matching event has a numeric count.', list); return; }
+    state.unranked.slice().sort((a, b) => d3.ascending(a.organization, b.organization) || d3.ascending(a.year, b.year)).forEach(d => {
+      const button = node('button', 'unranked-event', undefined, list); button.type = 'button'; button.dataset.eventId = d.id; button.setAttribute('aria-pressed', d.id === state.selected);
+      node('strong', '', `${d.organization} · ${d.year}`, button); node('span', '', d.recordsLabel || 'No comparable count', button);
+      if (d.recordsNote) node('small', '', d.recordsNote, button);
+      button.addEventListener('click', () => { selectEvent(d); $('selection-detail').scrollIntoView({ behavior: motion.matches ? 'auto' : 'smooth', block: 'nearest' }); });
+    });
   }
-  async function init() {
-    try {
-      const dataset = await d3.json('data/breaches.json');
-      if (!Array.isArray(dataset.events) || !dataset.events.length) throw new Error('No events found in the external JSON file.');
-      state.events = dataset.events.map((d) => ({ ...d, records: Number.isFinite(d.records) && d.records > 0 ? d.records : null }));
-      if (new Set(state.events.map((d) => d.id)).size !== state.events.length) throw new Error('Duplicate event IDs found in the dataset.');
-      const sortedSectors = d3.rollups(state.events, (events) => events.length, (d) => d.sector).sort((a, b) => b[1] - a[1] || d3.ascending(a[0], b[0]));
-      const topSectors = sortedSectors.slice(0, 5).map(([sector]) => sector);
-      const hasOther = sortedSectors.length > 5;
-      state.sectors = [...topSectors, ...(hasOther ? ['Other industries'] : [])];
-      state.events.forEach((d) => {
-        d.displaySector = topSectors.includes(d.sector) ? d.sector : 'Other industries';
-        d.searchText = [d.organization, d.sector, d.sectorRaw, d.method, d.methodRaw, d.year].join(' ').toLocaleLowerCase();
-      });
-      state.methods = d3.rollups(state.events, (events) => events.length, (d) => d.method).sort((a, b) => b[1] - a[1] || d3.ascending(a[0], b[0])).map(([method]) => method);
-      [state.minYear, state.maxYear] = d3.extent(state.events, (d) => d.year); state.year = state.maxYear;
-      $('year-slider').min = state.minYear; $('year-slider').max = state.maxYear; $('year-slider').value = state.maxYear;
-      $('year-min').textContent = state.minYear; $('year-max').textContent = state.maxYear;
-      $('grouping-note').textContent = hasOther ? 'Colors show the five most frequent source industries plus Other industries. Full original categories appear in event details.' : 'Industry colors remain consistent across all views.';
-      const legend = $('sector-legend');
-      state.sectors.forEach((sector, index) => { const label = document.createElement('span'); label.className = 'legend-item'; const dot = document.createElement('span'); dot.className = 'legend-dot'; dot.style.backgroundColor = palette[index]; dot.setAttribute('aria-hidden', 'true'); label.appendChild(dot); label.appendChild(document.createTextNode(sector)); legend.appendChild(label); });
-      const unresolved = state.events.filter((d) => d.records === null).length;
-      const approximate = state.events.filter((d) => d.recordsStatus === 'approximate' && d.records !== null).length;
-      $('data-audit-note').textContent = `Dataset audit: ${state.events.length} events retained; ${unresolved} events without a comparable numeric record count are shown separately in Scale; ${approximate} counts marked approximate. Values reflect the cited snapshot, not a live feed.`;
-      $('snapshot-date').textContent = 'Source snapshot: September 25, 2026.';
-      bindEvents(); update({ resize: true });
-      // Exposes only harmless layout state to support reproducible local QA.
-      window.breachExplorer = { getState: () => ({ layout: state.layout, year: state.year, total: state.events.length, visible: state.filtered.length, selected: state.selected, playing: state.playing }), getPositions: () => state.filtered.map((d) => ({ id: d.id, records: d.records, sector: d.displaySector, ...state.currentPositions.get(d.id) })), radius: RADIUS };
-    } catch (error) {
-      $('chart-status').hidden = false;
-      $('chart-status').classList.add('error-panel');
-      $('chart-status').textContent = `The dataset could not be loaded. Open this page through the course website or a local web server. ${error.message}`;
-      document.querySelectorAll('.explorer-toolbar button, .timeline-controls button, .timeline-controls input, #event-select, #search').forEach((el) => { el.disabled = true; });
-      console.error(error);
-    }
+  function update(resetPage = false) {
+    if (resetPage) state.page = 0;
+    state.filtered = state.events.filter(matches);
+    state.numeric = state.filtered.filter(d => Number.isFinite(d.records)).sort((a, b) => d3.descending(a.records, b.records) || d3.ascending(a.organization, b.organization) || d3.ascending(a.id, b.id));
+    state.unranked = state.filtered.filter(d => d.records === null);
+    state.page = Math.max(0, Math.min(state.page, Math.ceil(state.numeric.length / PAGE_SIZE) - 1));
+    const currentPage = state.numeric.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE);
+    if (!state.filtered.some(d => d.id === state.selected)) state.selected = currentPage[0]?.id || state.unranked[0]?.id || null;
+    $('result-count').textContent = `${state.filtered.length} of ${state.events.length} events`;
+    $('ranking-title').textContent = state.page ? 'Continue the ranking.' : 'Which reported breaches were largest?';
+    $('ranking-subtitle').textContent = 'Reported records · linear scale from zero · ≈ marks an approximate source count';
+    const leader = state.numeric[0];
+    $('ranking-summary').textContent = leader ? `${leader.organization} (${leader.year}) has the largest reported count in this selection: ${brief(leader)} records. ${state.unranked.length ? `${state.unranked.length} events cannot be ranked numerically.` : ''}` : 'No comparable record counts in this selection.';
+    renderRanking(); renderDetail(); renderSummary('sector', 'sector-summary'); renderSummary('method', 'method-summary'); renderUnranked();
+    $('live-status').textContent = `${state.filtered.length} matching events. ${$('page-status').textContent}. ${state.unranked.length} without comparable counts.`;
   }
-  init();
+  function install() {
+    $('search').addEventListener('input', event => { state.search = event.target.value.trim().toLocaleLowerCase(); update(true); });
+    [['sector-filter', 'sector'], ['method-filter', 'method']].forEach(([id, key]) => $(id).addEventListener('change', event => { state[key] = event.target.value; update(true); }));
+    $('reset-button').addEventListener('click', () => { state.search = state.sector = state.method = ''; state.selected = null; $('search').value = ''; $('sector-filter').value = ''; $('method-filter').value = ''; update(true); });
+    $('prev-page').addEventListener('click', () => { state.page--; state.selected = null; update(); });
+    $('next-page').addEventListener('click', () => { state.page++; state.selected = null; update(); });
+    new ResizeObserver(() => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (Math.floor($('rank-stage').clientWidth) !== lastWidth) renderRanking(); }, 80); }).observe($('rank-stage'));
+  }
+  d3.json('data/breaches.json').then(data => {
+    if (!Array.isArray(data.events) || !data.events.length) throw new Error('Missing event data');
+    state.events = data.events.map(d => ({ ...d, searchText: [d.organization, d.year, d.sector, d.sectorRaw, d.method, d.methodRaw].join(' ').toLocaleLowerCase() }));
+    [['sector-filter', 'sector', 'All industries'], ['method-filter', 'method', 'All causes']].forEach(([id, key, label]) => {
+      const select = $(id); select.replaceChildren(); node('option', '', label, select).value = '';
+      Array.from(new Set(state.events.map(d => d[key]))).sort(d3.ascending).forEach(value => { node('option', '', value, select).value = value; });
+    });
+    $('snapshot-date').textContent = 'Snapshot: September 25, 2026';
+    $('data-audit-note').textContent = '539 source events · 499 numeric counts · 40 unranked entries (11 unknown, 28 unresolved possible placeholders, 1 incompatible unit).';
+    update(); install();
+  }).catch(error => { console.error(error); $('empty-state').hidden = false; $('empty-state').textContent = 'The data could not be loaded. Reload this page or download the source JSON below.'; $('result-count').textContent = 'Data unavailable'; });
 })();
