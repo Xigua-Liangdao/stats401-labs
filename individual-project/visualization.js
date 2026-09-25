@@ -120,7 +120,7 @@
     const container = $(targetId); container.replaceChildren();
     const groups = d3.rollups(state.filtered, v => v.length, d => d[key]).sort((a, b) => d3.descending(a[1], b[1]) || d3.ascending(a[0], b[0]));
     if (!groups.length) { node('p', 'summary-empty', 'No matching events.', container); return; }
-    const max = groups[0][1];
+    const max = Math.max(...['sector', 'method'].flatMap(k => d3.rollups(state.filtered, v => v.length, d => d[k]).map(g => g[1])));
     const makeButton = ([label, n], parent) => {
       const btn = node('button', 'summary-row', undefined, parent); btn.type = 'button'; btn.setAttribute('aria-pressed', state[key] === label); btn.setAttribute('aria-label', `Filter ${key === 'sector' ? 'industry' : 'cause'}: ${label}, ${n} events`);
       const line = node('span', 'summary-line', undefined, btn);
