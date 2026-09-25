@@ -1,0 +1,545 @@
+{
+  "snapshotDate": "2026-09-25",
+  "totalCsvRowsIncludingHeader": 541,
+  "excludedInstructionRows": [
+    2
+  ],
+  "stats": {
+    "eventCount": 539,
+    "numericCount": 499,
+    "unknownOrUnresolvedCount": 40,
+    "explicitUnknownCount": 11,
+    "explicitUnknownDisplayCount": 6,
+    "explicitUnknownNarrativeCount": 5,
+    "unresolvedPlaceholderCount": 28,
+    "incompatibleUnitCount": 1,
+    "approximateCount": 17,
+    "displayedNumericOverrides": 16,
+    "yearMin": 2004,
+    "yearMax": 2026,
+    "numericMin": 30,
+    "numericMax": 2700000000,
+    "sectorCounts": {
+      "Web": 146,
+      "Government": 61,
+      "Health": 56,
+      "Retail": 53,
+      "Finance": 50,
+      "Technology": 39,
+      "Telecoms": 30,
+      "Transport": 26,
+      "Gaming": 20,
+      "Other": 18,
+      "Multiple sectors": 17,
+      "Education": 16,
+      "Military": 4,
+      "Media": 3
+    },
+    "methodCounts": {
+      "Hacked": 379,
+      "Poor security": 62,
+      "Lost device": 48,
+      "Accidental exposure": 27,
+      "Inside job": 22,
+      "Multiple methods": 1
+    },
+    "yearCounts": {
+      "2004": 1,
+      "2005": 3,
+      "2006": 5,
+      "2007": 10,
+      "2008": 19,
+      "2009": 9,
+      "2010": 13,
+      "2011": 37,
+      "2012": 23,
+      "2013": 35,
+      "2014": 20,
+      "2015": 25,
+      "2016": 33,
+      "2017": 25,
+      "2018": 41,
+      "2019": 45,
+      "2020": 30,
+      "2021": 36,
+      "2022": 26,
+      "2023": 55,
+      "2024": 26,
+      "2025": 21,
+      "2026": 1
+    },
+    "missingStoryCount": 6,
+    "missingSourceCount": 1
+  },
+  "uncertainCounts": [
+    {
+      "id": "breach-7",
+      "organization": "KDDI",
+      "year": 2006,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-19",
+      "organization": "Driving Standards Agency",
+      "year": 2007,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-45",
+      "organization": "CheckFree Corporation",
+      "year": 2009,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-85",
+      "organization": "Chinese gaming sites",
+      "year": 2011,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-90",
+      "organization": "Epsilon",
+      "year": 2011,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-123",
+      "organization": "ssndob.ms",
+      "year": 2013,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-137",
+      "organization": "Nintendo",
+      "year": 2013,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-161",
+      "organization": "GMail",
+      "year": 2014,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-167",
+      "organization": "European Central Bank",
+      "year": 2014,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-168",
+      "organization": "UPS",
+      "year": 2014,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-171",
+      "organization": "Sony Pictures",
+      "year": 2014,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-188",
+      "organization": "US Office of Personnel Management",
+      "year": 2015,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-199",
+      "organization": "Twitch",
+      "year": 2015,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-205",
+      "organization": "Interpark",
+      "year": 2016,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-218",
+      "organization": "Clinton campaign",
+      "year": 2016,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-219",
+      "organization": "Wendy's",
+      "year": 2016,
+      "recordsRaw": "1,025",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "source count describes systems, not records"
+    },
+    {
+      "id": "breach-235",
+      "organization": "Viacom",
+      "year": 2017,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-246",
+      "organization": "Swedish Transport Agency",
+      "year": 2017,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-248",
+      "organization": "Cellebrite",
+      "year": 2017,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "explicit unknown in source narrative"
+    },
+    {
+      "id": "breach-268",
+      "organization": "Amazon",
+      "year": 2018,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-275",
+      "organization": "Grindr",
+      "year": 2018,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-280",
+      "organization": "Helse Sør-Øst RHF",
+      "year": 2018,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-286",
+      "organization": "Saks and Lord & Taylor",
+      "year": 2018,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-313",
+      "organization": "Stronghold Kingdoms",
+      "year": 2019,
+      "recordsRaw": "5,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-314",
+      "organization": "Roll20",
+      "year": 2019,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-365",
+      "organization": "Spotify",
+      "year": 2020,
+      "recordsRaw": "500,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "explicit unknown in source narrative"
+    },
+    {
+      "id": "breach-367",
+      "organization": "SolarWinds",
+      "year": 2020,
+      "recordsRaw": "50,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "explicit unknown in source narrative"
+    },
+    {
+      "id": "breach-376",
+      "organization": "Ubiquiti",
+      "year": 2021,
+      "recordsRaw": "16,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "explicit unknown in source narrative"
+    },
+    {
+      "id": "breach-378",
+      "organization": "Digital Ocean",
+      "year": 2021,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-379",
+      "organization": "Peloton",
+      "year": 2021,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-383",
+      "organization": "MacDonalds",
+      "year": 2021,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-394",
+      "organization": "Syniverse",
+      "year": 2021,
+      "recordsRaw": "500,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-395",
+      "organization": "Twitch",
+      "year": 2021,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-404",
+      "organization": "Acer",
+      "year": 2021,
+      "recordsRaw": "3,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-431",
+      "organization": "Clorox",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-434",
+      "organization": "Microsoft",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "unknown",
+      "recordsBasis": "explicit unknown in displayed-records field"
+    },
+    {
+      "id": "breach-440",
+      "organization": "MSI",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-441",
+      "organization": "Acer",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    },
+    {
+      "id": "breach-449",
+      "organization": "Yum!",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "explicit unknown in source narrative"
+    },
+    {
+      "id": "breach-460",
+      "organization": "Maximus",
+      "year": 2023,
+      "recordsRaw": "10,000,000",
+      "displayedRecordsRaw": "",
+      "recordsBasis": "unresolved placeholder ambiguity"
+    }
+  ],
+  "numericOverrides": [
+    {
+      "id": "breach-150",
+      "organization": "Yahoo",
+      "year": 2013,
+      "recordsRaw": "550,000,000",
+      "displayedRecordsRaw": "1bn",
+      "records": 1000000000
+    },
+    {
+      "id": "breach-214",
+      "organization": "VK",
+      "year": 2016,
+      "recordsRaw": "171,000,000",
+      "displayedRecordsRaw": "100m",
+      "records": 100000000
+    },
+    {
+      "id": "breach-259",
+      "organization": "Mount Olympus",
+      "year": 2016,
+      "recordsRaw": "1,100",
+      "displayedRecordsRaw": "188K",
+      "records": 188000
+    },
+    {
+      "id": "breach-251",
+      "organization": "Spambot",
+      "year": 2017,
+      "recordsRaw": "520,000,000",
+      "displayedRecordsRaw": "711m",
+      "records": 711000000
+    },
+    {
+      "id": "breach-276",
+      "organization": "Aadhaar",
+      "year": 2018,
+      "recordsRaw": "550,000,000",
+      "displayedRecordsRaw": "1.1bn",
+      "records": 1100000000
+    },
+    {
+      "id": "breach-304",
+      "organization": "Facebook",
+      "year": 2019,
+      "recordsRaw": "419,000,000",
+      "displayedRecordsRaw": "420m",
+      "records": 420000000
+    },
+    {
+      "id": "breach-308",
+      "organization": "Indian citizens",
+      "year": 2019,
+      "recordsRaw": "275,265,298",
+      "displayedRecordsRaw": "275m",
+      "records": 275000000
+    },
+    {
+      "id": "breach-397",
+      "organization": "Avvo",
+      "year": 2019,
+      "recordsRaw": "4,101,101",
+      "displayedRecordsRaw": "4.1m",
+      "records": 4100000
+    },
+    {
+      "id": "breach-357",
+      "organization": "US Marshals Service",
+      "year": 2020,
+      "recordsRaw": "387,000",
+      "displayedRecordsRaw": "287K",
+      "records": 287000
+    },
+    {
+      "id": "breach-373",
+      "organization": "Gab",
+      "year": 2021,
+      "recordsRaw": "4,000,000",
+      "displayedRecordsRaw": "100K",
+      "records": 100000
+    },
+    {
+      "id": "breach-405",
+      "organization": "Travelio",
+      "year": 2021,
+      "recordsRaw": "471,376",
+      "displayedRecordsRaw": "470K",
+      "records": 470000
+    },
+    {
+      "id": "breach-407",
+      "organization": "Robinhood",
+      "year": 2021,
+      "recordsRaw": "5,000,937",
+      "displayedRecordsRaw": "5m",
+      "records": 5000000
+    },
+    {
+      "id": "breach-413",
+      "organization": "CDEK",
+      "year": 2022,
+      "recordsRaw": "18,218,203",
+      "displayedRecordsRaw": "19m",
+      "records": 19000000
+    },
+    {
+      "id": "breach-420",
+      "organization": "Shanghai Police",
+      "year": 2022,
+      "recordsRaw": "500,000,000",
+      "displayedRecordsRaw": "\"one billion\"",
+      "records": 1000000000
+    },
+    {
+      "id": "breach-424",
+      "organization": "Indonesian SIM cards",
+      "year": 2022,
+      "recordsRaw": "1,000,000,000",
+      "displayedRecordsRaw": "1.3bn",
+      "records": 1300000000
+    },
+    {
+      "id": "breach-504",
+      "organization": "National Public Data",
+      "year": 2024,
+      "recordsRaw": "1,000,000,000",
+      "displayedRecordsRaw": "2.7bn",
+      "records": 2700000000
+    }
+  ],
+  "typographicalCorrections": [
+    {
+      "id": "breach-479",
+      "field": "records lost",
+      "from": "53;000",
+      "to": 53000,
+      "sourceUrl": "https://www.bleepingcomputer.com/news/security/nissan-north-america-data-breach-impacts-over-53-000-employees/"
+    },
+    {
+      "id": "breach-480",
+      "field": "records lost",
+      "from": "2,400,00",
+      "to": 2400000,
+      "sourceUrl": "https://www.bleepingcomputer.com/news/security/webtpa-data-breach-impacts-24-million-insurance-policyholders/"
+    }
+  ],
+  "missingSources": [
+    "breach-396"
+  ]
+}

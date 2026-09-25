@@ -1,0 +1,44 @@
+<!-- Report body: 707 words, excluding headings and references. -->
+<article class="project-report" aria-label="Visualization critique and redesign report">
+  <section class="report-part">
+    <h3>Purpose, audience, and data</h3>
+    <p>Information Is Beautiful’s <a href="https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/" target="_blank" rel="noopener noreferrer">“World’s Biggest Data Breaches &amp; Hacks”</a> introduces a public audience to the scale and variety of reported data breaches. Its audience includes readers exploring familiar organizations, journalists seeking examples, and students comparing sectors or causes. Useful tasks include finding an event, comparing its reported size, and examining how events are distributed across categories.</p>
+    <p>This redesign uses an external JSON snapshot prepared from the visualization’s <a href="https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit" target="_blank" rel="noopener noreferrer">linked data sheet</a>. Each dot represents one listed event, with organization, reporting year, sector, method, and reported record count. Records are not necessarily unique people, and the year denotes when the story broke, not necessarily when the breach occurred.</p>
+    <p>The downloaded snapshot is dated September 25, 2026 and contains 539 listed events with reporting years from 2004 through 2026. All source rows are retained, including entries below the original graphic’s stated 30,000-record threshold. Preserving that file and its source references makes the analysis reproducible even if the live editorial collection is later updated.</p>
+  </section>
+
+  <section class="report-part">
+    <h3>Two strengths worth preserving</h3>
+    <p>First, the original combines a chronological overview with conspicuous differences in bubble size. This makes unusually large events visually prominent and gives readers an immediate sense of the dataset’s scale. Second, the visualization connects recognizable organization names with explanatory event details and sources. Those entry points support exploratory reading: a familiar company can lead readers into an unfamiliar security story. The original also provides filters and search, so adding those controls alone would not constitute a redesign. Figure 1 shows the original presentation.</p>
+  </section>
+
+  <section class="report-part">
+    <h3>Three issues with comparison</h3>
+    <p>The first issue is visual competition. Large bubbles dominate the available space, while smaller marks and labels compete in dense regions. A reader looking for a modest-sized breach must work harder to locate it and connect it with its description.</p>
+    <p>The second issue is quantitative comparison. Circle area offers no shared baseline, making similarly sized events difficult to distinguish accurately. The range of record counts compounds this problem: preserving the largest bubbles makes small events visually inconspicuous.</p>
+    <p>The third issue concerns categorical comparison. A chronological arrangement supports browsing through time, but comparing events within an industry or across methods requires readers to gather scattered marks mentally. Filtering narrows the selection; it does not, by itself, provide an aligned view of the remaining distribution.</p>
+  </section>
+
+  <section class="report-part">
+    <h3>Redesign decisions</h3>
+    <p>The redesign first assigns every event the same dot size. This prevents record count from determining how much visual territory an event receives. Equal dots describe the collection of events; they do not imply that all breaches have equal consequences.</p>
+    <p>Second, sector and method views regroup those same dots into labeled clusters. Grouping makes category membership spatially explicit, reducing the need to search across a timeline. Continuous transitions preserve each event’s identity as the arrangement changes. The useful improvement comes from the destination layout; animation helps readers follow the change rather than solving clutter on its own.</p>
+    <p>Third, a scale view places dots along a labeled logarithmic axis and separates nearby marks with a beeswarm layout. Position supports more precise magnitude comparisons than circle area, while logarithmic spacing accommodates several orders of magnitude. Equal distances indicate equal ratios, not equal additions.</p>
+    <p>Finally, event details appear on selection instead of attaching every story to the main plot. This keeps the overview readable while retaining names, reported values, and source links. Entries with unknown counts, unresolved possible placeholders, or incompatible units remain in category views and a separate area beside the numeric axis. This avoids giving editorial stand-ins false quantitative precision.</p>
+  </section>
+
+  <section class="report-part">
+    <h3>Before, after, and limitations</h3>
+    <p>Compared with Figure 1, Figure 2 assigns small and large events equal-sized marks and supplies a common position scale for magnitude. The grouping views prioritize categorical exploration; the original remains stronger at conveying an immediate visual impression of enormous events. These are task-based tradeoffs, not evidence that one chart is universally better.</p>
+    <p>The redesign also has limits. Dense groups can still be difficult to inspect, logarithmic scales require explanation, and animated transitions can distract. Category labels simplify events that may cross industries or involve multiple causes. Source quantities also vary: accounts, documents, images, and other reported units are not directly equivalent. Most importantly, this is a curated collection, not a complete census: category counts and reporting-year patterns cannot establish underlying breach incidence or relative industry risk. No user study was conducted; the claimed improvements are design arguments tied to specific reading tasks.</p>
+  </section>
+
+  <footer class="report-references">
+    <h3>References</h3>
+    <ol>
+      <li>Information Is Beautiful. <a href="https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/" target="_blank" rel="noopener noreferrer"><cite>World’s Biggest Data Breaches &amp; Hacks</cite></a>. Design and concept: David McCandless; code: Tom Evans. Accessed September 25, 2026. Original visualization shown in Figure 1.</li>
+      <li>Information Is Beautiful. <a href="https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit" target="_blank" rel="noopener noreferrer"><cite>World’s Biggest Data Breaches</cite> source spreadsheet</a>. Accessed September 25, 2026. Includes event descriptions and links to underlying news reports.</li>
+      <li><a href="data/breaches-source-2026-09-25.csv">Archived source CSV</a>, downloaded September 25, 2026. The live visualization loads a cleaned external JSON derived from this snapshot.</li>
+    </ol>
+  </footer>
+</article>
