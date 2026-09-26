@@ -109,7 +109,7 @@
     [1e9,1e8,1e7].forEach((n,i)=>{
       const x=35+i*63,r=46*Math.sqrt(n/2.7e9);
       legend.append('circle').attr('cx',x).attr('cy',32).attr('r',r).attr('fill','#247c78').attr('opacity',.6);
-      legend.append('text').attr('x',x).attr('y',67).attr('text-anchor','middle').attr('font-size',10).attr('fill','#607366').text(compact(n));
+      legend.append('text').attr('x',x).attr('y',67).attr('text-anchor','middle').attr('font-size',10).attr('fill','#586477').text(compact(n));
     });
   }
   function drawAnnotations(svg) {
@@ -159,8 +159,8 @@
     const barWidth=(width-45)/(yearMax-yearMin+1)-3;
     svg.append('g').selectAll('rect').data(yearData).join('rect').attr('class',d=>`overview-bar${d.year>=state.start&&d.year<=state.end?' is-focused':''}`).attr('x',d=>overviewX(d.year)-barWidth/2).attr('y',d=>y(d.count)).attr('width',barWidth).attr('height',d=>77-y(d.count)).append('title').text(d=>`${d.year}: ${d.count} matching source events`);
     svg.append('g').attr('class','axis').attr('transform','translate(0,77)').call(d3.axisBottom(overviewX).tickValues(d3.range(yearMin,yearMax+1,2)).tickFormat(d3.format('d')).tickSize(3));
-    svg.append('text').attr('x',27).attr('y',15).attr('text-anchor','end').attr('font-size',9).attr('fill','#65756f').text(d3.max(yearData,d=>d.count));
-    svg.append('text').attr('x',27).attr('y',78).attr('text-anchor','end').attr('font-size',9).attr('fill','#65756f').text('0');
+    svg.append('text').attr('x',27).attr('y',15).attr('text-anchor','end').attr('font-size',9).attr('fill','#687486').text(d3.max(yearData,d=>d.count));
+    svg.append('text').attr('x',27).attr('y',78).attr('text-anchor','end').attr('font-size',9).attr('fill','#687486').text('0');
     brush=d3.brushX().extent([[30,8],[width-15,77]]).on('end',event=>{
       if(syncingBrush||!event.sourceEvent)return;
       if(!event.selection){setYears(yearMin,yearMax);return;}
@@ -207,13 +207,13 @@
     svg.selectAll('*').remove();
     list.forEach((e,i)=>{
       const y=24+i*65;
-      svg.append('text').attr('x',0).attr('y',y).attr('font-size',11).attr('fill','#17332f').attr('font-weight',600).text(`${e.organization.length > Math.floor((width-115)/6) ? e.organization.slice(0,Math.max(10,Math.floor((width-115)/6)-1))+'…' : e.organization} (${e.year})`).append('title').text(`${e.organization} (${e.year})`);
-      svg.append('text').attr('x',width-10).attr('y',y).attr('font-size',11).attr('text-anchor','end').attr('fill','#17332f').text(label(e));
-      svg.append('rect').attr('x',0).attr('y',y+10).attr('width',width-10).attr('height',16).attr('fill','#edf0e7');
+      svg.append('text').attr('x',0).attr('y',y).attr('font-size',11).attr('fill','#24384a').attr('font-weight',600).text(`${e.organization.length > Math.floor((width-115)/6) ? e.organization.slice(0,Math.max(10,Math.floor((width-115)/6)-1))+'…' : e.organization} (${e.year})`).append('title').text(`${e.organization} (${e.year})`);
+      svg.append('text').attr('x',width-10).attr('y',y).attr('font-size',11).attr('text-anchor','end').attr('fill','#24384a').text(label(e));
+      svg.append('rect').attr('x',0).attr('y',y+10).attr('width',width-10).attr('height',16).attr('fill','#eef3f8');
       svg.append('rect').attr('class','comparison-bar').attr('data-id',e.id).attr('data-records',e.records).attr('x',0).attr('y',y+10).attr('width',x(e.records)).attr('height',16).attr('fill',color(e));
     });
     svg.append('g').attr('class','axis').attr('transform',`translate(0,${height-37})`).call(d3.axisBottom(x).ticks(width<500?3:6).tickFormat(compact).tickSize(4));
-    svg.append('text').attr('x',width-10).attr('y',height-5).attr('font-size',10).attr('text-anchor','end').attr('fill','#65756f').text('Reported records · linear scale, starting at zero');
+    svg.append('text').attr('x',width-10).attr('y',height-5).attr('font-size',10).attr('text-anchor','end').attr('fill','#687486').text('Reported records · linear scale, starting at zero');
   }
   let inputTimer;
   $('search').addEventListener('input',()=>{clearTimeout(inputTimer);inputTimer=setTimeout(()=>{state.query=$('search').value;state.page=0;render();},120);});
