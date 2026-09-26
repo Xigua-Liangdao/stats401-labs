@@ -15,7 +15,7 @@ This checklist follows the assignment requirements already provided in the conve
 | Compare original and redesign, including limitations | Report: “Before, after, and limitations”; Figures 1, 2, and 3 compare original, Alternative A, and Alternative B | Text and all three linked figures checked locally |
 | Include a 500–800-word report | `report.md` and matching `report.html`: **745 body words**, excluding headings and references | Word count checked |
 | Include original image, redesigned visualization, screenshots, and sources | Figure 1: `assets/original-chart.png`; Figure 2: `assets/redesign-bubbles.png`; Figure 3: `assets/redesign-time-size.png`; both redesign screenshots use 2022–2026 | Images, captions, report, and source links checked locally |
-| Add a “Visualization Critique and Redesign” section to the GitHub Pages course website | Course website: `https://xigua-liangdao.github.io/stats401-labs/`; project: `/individual-project/` | Local page complete; updated deployment check pending |
+| Add a “Visualization Critique and Redesign” section to the GitHub Pages course website | Course website: `https://xigua-liangdao.github.io/stats401-labs/`; project: `/individual-project/` | Published; GitHub Pages and both live views checked September 26, 2026 |
 | Submit the project webpage URL to Canvas | The submission URL is the published project URL | **Not submitted, as requested** |
 
 ## One-minute presentation
@@ -60,3 +60,11 @@ The following checks were completed on the implemented page before deployment:
 - The accompanying 114-word script has a one-minute timing guide; the author still needs to rehearse its delivery.
 
 Updated deployment verification is the only remaining artifact check. Canvas submission remains intentionally unperformed.
+
+## Deployment verification
+
+- GitHub Pages build and deployment for implementation commit `ee6c070` completed successfully.
+- Live browser loaded both alternatives: 499 numeric bubbles in A; 499 events represented by B singleton/group membership. The full page reports 539 source events.
+- Live B focus on 2022–2026 reports 123 numeric and 6 nonnumeric events; both view buttons work and no console errors were observed.
+- Downloaded live HTML, visualization controller, layout module, both redesign screenshots, PDF, and JSON are byte-for-byte identical to the inspected local deliverables.
+- The course-home project card links to the updated individual project. Canvas remains unsubmitted.
