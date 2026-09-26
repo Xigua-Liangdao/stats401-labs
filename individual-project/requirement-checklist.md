@@ -1,24 +1,26 @@
 # Assignment requirements and evidence
 
-This checklist follows the assignment requirements already provided in the conversation. The original Canvas pages were **not freshly rechecked**: the school login had expired, and the author asked to finish the work without submitting to Canvas. This file does not claim a Canvas submission or an instructor evaluation.
+The [Individual Project assignment](https://canvas.duke.edu/courses/87959/assignments/395542) was rechecked in the authenticated Canvas page on September 27, 2026. Its report requirement is **“500–800 word report.”** The checklist below maps the published project to those requirements; it does not claim an instructor evaluation. Canvas submission remains unperformed at the author’s request.
 
 ## Individual project
 
 | Requirement | Evidence | Review status |
 | --- | --- | --- |
-| Critique a sufficiently complex existing visualization | Information Is Beautiful’s *World’s Biggest Data Breaches & Hacks*, with hundreds of events, magnitude encoding, chronology, categories, and event stories | Identified; source cited in the report |
-| Explain data, intended audience, and tasks | Report: “Purpose, audience, and data”; the public-overview purpose is explicitly labeled as an interpretation | Report checked |
+| Critique a sufficiently complex existing visualization | Information Is Beautiful’s *World’s Biggest Data Breaches & Hacks*, with hundreds of events, magnitude encoding, chronology, categories, and event stories | Identified; original source linked in the report and figure caption |
+| Explain data, intended audience, and tasks | Report: “Reading the original”; the public-overview purpose is explicitly labeled as an interpretation | Report checked |
 | Identify at least two strengths | Report: chronology/magnitude overview; recognizable organizations linked to stories and sources | Two strengths checked |
 | Identify at least three problems and their consequences | Report: visual competition; difficulty comparing area; dispersed cases requiring mental comparison | Three limitations checked |
 | Build a D3.js redesign using an external CSV or JSON file | Bubble timeline loads `data/breaches.json`; browser totals match the frozen CSV and transformation audit | Final local runtime checked |
-| Explain at least three design decisions | Report: proportional circles and packing; overview/focus; annotations; named list/details; separate linear comparison | Five decisions checked |
-| Compare original and redesign, including limitations | Report: “Before, after, and limitations”; Figure 1 is original and Figure 2 is the bubble timeline | Updated text and two figures checked locally |
-| Include a 500–800-word report | `report.md` and matching `report.html`: **737 body words**, excluding headings and references | Word count checked |
-| Include original image, redesigned visualization, screenshots, and sources | Figure 1: `assets/original-chart.png`; Figure 2: `assets/redesign-bubbles.png`, focused on 2022–2026 | Images, captions, report links, and asset paths checked locally |
-| Add a “Visualization Critique and Redesign” section to the GitHub Pages course website | Course website: `https://xigua-liangdao.github.io/stats401-labs/`; project: `/individual-project/` | Course section and permalink are present; the updated live page is checked after publication. |
+| Explain at least three design decisions | Report: proportional circles and packing; overview/focus; selective annotations with a named list and details; separate linear comparison | Four decisions checked |
+| Compare original and redesign, including limitations | Report: “What improves, and what remains difficult”; Figure 1 is original and Figure 2 is the bubble timeline | Updated text and two figures checked locally |
+| Include a 500–800-word report | `report.md` and matching `report.html`: **645 body words**, excluding headings | Word count checked |
+| Include original image, redesigned visualization, screenshots, and sources | Figure 1: `assets/original-chart.png`; Figure 2: `assets/redesign-bubbles.png`, focused on 2022–2026 | Images, captions, inline source links, and asset paths checked locally |
+| Add a “Visualization Critique and Redesign” section to the GitHub Pages course website | Course website: `https://xigua-liangdao.github.io/stats401-labs/`; project: `/individual-project/` | Course homepage navigation and project section link to the original/data, redesign, before/after figures, and report; repository README provides the same entry points. Live deployment is checked after publication. |
 | Submit the project webpage URL to Canvas | The submission URL is the published project URL | **Not submitted, as requested** |
 
 ## One-minute presentation
+
+The [presentation assignment](https://canvas.duke.edu/courses/87959/assignments/395556) was also rechecked on September 27, 2026: one page, one minute, PDF export, and `FirstName_LastName.pdf`. Both assignments display a September 27, 2026, 11:59 pm deadline.
 
 | Requirement | Evidence | Review status |
 | --- | --- | --- |
@@ -49,7 +51,7 @@ The final page and its retained controls were checked in the browser. The applic
 - No browser console errors were observed. Repeated rendering retains exactly two axis labels; the reset control explicitly says “Reset filters.”
 
 - The final page contains only the bubble timeline, with no view switch. Previously saved query links normalize to the canonical page.
-- The original and redesign appear as exactly two before/after figures. The displayed report count is 737 words.
+- The original and redesign appear as exactly two before/after figures. The displayed report count is 645 words.
 - Final checks confirmed 499 circles for the full collection, 123 numeric plus 6 nonnumeric events for 2022–2026, Wendy’s unavailable count and disabled comparison button, and reset followed by keyboard selection of SoundCloud and a three-event comparison.
 - Asset paths are valid and document IDs are unique.
 

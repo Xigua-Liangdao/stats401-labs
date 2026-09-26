@@ -808,3 +808,9 @@ p {
         flex-direction: column;
     }
 }
+
+/* Individual project entry on the course homepage. */
+.lab-nav .project-nav-link { color: #fff; background: #245f59; }
+.project-section { margin-bottom: 24px; scroll-margin-top: 24px; }
+.project-links { display: flex; flex-wrap: wrap; gap: 10px 24px; list-style: none; margin: 24px 0 0; padding: 18px 0 0; border-top: 1px solid #e1e6ec; }
+.project-links a { color: #245f59; font-size: 14px; text-underline-offset: 3px; }

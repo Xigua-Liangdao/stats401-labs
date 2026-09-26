@@ -6,7 +6,7 @@ This project preserves the original visualization’s public overview of major r
 
 ## Deliverables
 
-- [Interactive project and 737-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
+- [Interactive project and 645-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
 - [One-page presentation PDF](assets/Teresa_Tu.pdf)
 - [One-minute speaking script](presentation-notes.md)
 - [Assignment requirements and verification](requirement-checklist.md)

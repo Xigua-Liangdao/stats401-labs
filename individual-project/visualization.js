@@ -35,7 +35,7 @@
   populate($('method-filter'), [...new Set(events.map(e => e.method))].sort());
   ['year-start','year-end'].forEach(id => populate($(id), d3.range(yearMin, yearMax + 1)));
   $('sector-legend').innerHTML = [...colors].map(([name,fill]) => `<span class="legend-item"><span class="legend-dot" style="background:${fill}"></span>${name}</span>`).join('');
-  $('data-audit-note').textContent = 'The snapshot retains 539 source events, including below-threshold entries. Of these, 499 have usable numeric counts. The other 40 comprise 11 explicitly unknown values, 28 uncorroborated possible placeholders, and one count of systems rather than records. Treat unresolved values as uncertain, not proven unknown. Seventeen numeric labels are approximate.';
+  $('data-audit-note').textContent = 'The collection includes 539 reported events, including entries below the original graphic’s size threshold. The timeline plots the 499 with usable counts; the other 40 remain in the event list and overview. Some reported quantities are approximate.';
 
   function render() {
     base = events.filter(baseMatch);

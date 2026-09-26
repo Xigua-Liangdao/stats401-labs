@@ -1,46 +1,29 @@
-<!-- Report body: 737 words, excluding headings and references. -->
+<!-- Report body: 645 words, excluding section headings. -->
 <article class="project-report" aria-label="Visualization critique and redesign report">
   <section class="report-part">
-    <h3>Purpose, audience, and data</h3>
-    <p>I interpret Information Is Beautiful’s <a href="https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/" target="_blank" rel="noopener noreferrer">“World’s Biggest Data Breaches &amp; Hacks”</a> as a public overview of major reported breaches: readers notice their magnitude, locate familiar organizations, and investigate individual stories. This is an inference from its design, not an explicit author statement. My redesign preserves that overview while making dense periods and selected events easier to inspect and compare.</p>
-    <p>The D3 bubble timeline loads an external JSON file derived from the original’s <a href="https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit" target="_blank" rel="noopener noreferrer">linked spreadsheet</a>. The September 25, 2026 snapshot retains 539 events across reporting years 2004–2026, including entries below the original graphic’s stated 30,000-record threshold. There are 499 usable numeric counts and 40 unknown, unresolved, or incompatible-unit entries. Year means when the story broke, not necessarily when the breach happened. Reported records are not unique people.</p>
-    <p>The excluded counts comprise 11 explicitly unknown values, 28 possible placeholders lacking corroboration, and one count of systems rather than records. Exclusion is conservative: an unresolved value is not proof that the real quantity is unknown.</p>
+    <h3>Reading the original</h3>
+    <p>The title of Information Is Beautiful’s <a href="https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/" target="_blank" rel="noopener noreferrer">“World’s Biggest Data Breaches &amp; Hacks”</a> suggests that scale is central to the story. The contrast between large and small bubbles reinforces that message, while their chronological arrangement places individual incidents within a longer history. Familiar organization names give readers somewhere to start, and event descriptions and source links let them follow a story further. I read this as an invitation for a general audience to explore the scale and history of major breaches. My redesign aims to keep that experience while making individual events easier to find and compare.</p>
+    <p>The data come from the original’s <a href="https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit" target="_blank" rel="noopener noreferrer">linked spreadsheet</a>. My D3 timeline loads an external JSON file containing 539 events from reporting years 2004–2026. Of these, 499 have usable numeric counts; the other 40 remain available in the list and overview. The full sheet includes entries below the original graphic’s stated 30,000-record threshold. Years refer to when stories were reported, which may differ from when breaches happened.</p>
   </section>
 
   <section class="report-part">
-    <h3>Two strengths worth preserving</h3>
-    <p>First, the original’s chronology and contrasting bubble sizes give a striking impression of time and magnitude. Large events attract attention before readers study exact values. Second, recognizable organization names lead into stories and source links, connecting an abstract collection to specific incidents. These strengths support discovery as well as numerical reading. The original already has search and filters; adding them alone would not establish an improvement. Figure 1 is an excerpt of the original.</p>
+    <h3>What works, and what gets in the way</h3>
+    <p>The original has two strengths I wanted to preserve. Its size contrasts make major events immediately noticeable, giving the collection an impact that a table would lose. Its recognizable names and linked stories also turn abstract quantities into incidents that readers can investigate. Figure 1 shows an excerpt of this design.</p>
+    <p>The difficulty is reading beyond those initial impressions. Large circles occupy much of the space, leaving small events and nearby labels competing for attention. Comparing quantities is another problem: two circle areas are harder to judge than lengths starting from the same baseline, especially when values are similar. Category comparisons also require work because incidents from one industry or cause are spread across the timeline. The original already provides search and filters, but readers still need to locate individual values and remember them while comparing cases.</p>
   </section>
 
   <section class="report-part">
-    <h3>Three limitations</h3>
-    <p>First, large bubbles dominate space, making smaller marks and nearby labels compete for attention. A readable overview becomes harder to maintain in dense regions.</p>
-    <p>Second, circle areas lack a common baseline. Similar quantities are difficult to distinguish, while extreme values make smaller events visually inconspicuous. A dramatic impression of scale does not guarantee accurate comparison.</p>
-    <p>Third, events from an industry or cause are dispersed through the chronological display. Comparing selected cases requires finding their marks and retaining their values mentally. Filtering reduces the collection, but does not itself provide a common comparison baseline.</p>
+    <h3>How the redesign responds</h3>
+    <p>I kept the bubble timeline because it supports the original purpose. Solid circle area remains proportional to the reported count, and horizontal position shows reporting year. Circles are packed vertically to separate them; height does not represent another variable. Small outlined rings make tiny events easier to select without exaggerating their solid areas. The area scale stays fixed when the reader changes the year window.</p>
+    <p>A compact overview keeps the full timeline visible below the main chart. Readers can drag across a period or choose its starting and ending years, then narrow the selection by organization, industry, or cause. Focusing gives a dense period more horizontal space, while the overview shows where that period belongs in the full collection.</p>
+    <p>Labels identify major and selected events without covering their circles. A paginated list supplies names and printed quantities for every matching event, so readers do not have to identify everything from marks alone. Selecting a name opens its story, quantity, and available sources. Events without usable counts stay accessible here rather than receiving a misleading bubble size.</p>
+    <p>For direct comparison, readers can select up to three numeric events and see their quantities as linear bars starting at zero. Printed values support comparisons when one bar is much shorter than another. This gives the timeline a supporting tool for precise reading without making ranking the main experience.</p>
   </section>
 
   <section class="report-part">
-    <h3>Design decisions</h3>
-    <p>First, the redesign retains circles with solid areas proportional to reported count and horizontal positions corresponding to reporting year. Vertical packing separates circles; vertical position has no data meaning. Outlined visibility rings make tiny events selectable without enlarging their encoded solid areas. A fixed area scale across focused periods preserves the meaning of size when the year window changes.</p>
-    <p>Second, a compact overview counts source events by reporting year. Brushing a period, or choosing its start and end years, focuses the main timeline while the full temporal context remains visible. Organization search and industry or cause filters refine that focus. This lets readers inspect dense periods while understanding where they fall within the collection.</p>
-    <p>Third, annotations identify major and selected events, with placement that avoids covering circle marks. Labeling selectively preserves room for the overview, while names and printed quantities in the result list provide a more systematic way to read individual cases. This is a deliberate division of work between visual discovery and explicit identification.</p>
-    <p>Fourth, selecting a named event opens its reported quantity, story, and available source links. Pagination makes every matching entry accessible without placing hundreds of labels on the chart. The 40 events without usable counts remain in the named list and year overview, but receive no invented proportional bubble. Their count explanations remain available in the details.</p>
-    <p>Fifth, readers can choose up to three numeric events for a secondary, zero-baseline linear bar comparison with printed values. This addresses the area-comparison problem while retaining the main timeline’s visual emphasis on magnitude. Brief transitions acknowledge changes in the display; understanding the result does not depend on autoplay or remembering an animation.</p>
+    <h3>What improves, and what remains difficult</h3>
+    <p>Compared with Figure 1, the redesign in Figure 2 separates circles and offers a clearer route from the full collection to a few relevant cases. The timeline still communicates scale and history; the list and comparison bars help readers examine what they find.</p>
+    <p>There are still tradeoffs. Packing needs space, tiny circles remain difficult to see, and selective labels leave some work to the list. Source quantities can refer to accounts, documents, or images, so they are not equivalent to unique people. Values have not all been independently verified, and this curated collection cannot establish worldwide breach incidence or industry risk. I have not conducted a user study, so these are design reasons for expecting easier reading, rather than measured improvements.</p>
   </section>
-
-  <section class="report-part">
-    <h3>Before, after, and limitations</h3>
-    <p>Figure 2 preserves Figure 1’s chronology and scale emphasis, while separating circles and adding focused inspection with a persistent overview. The accompanying list and comparison bars make selected names and values explicit. These changes support the original discovery task rather than redefining the project as a ranking alone.</p>
-    <p>The tradeoffs remain. Packing can require more space, tiny-event rings add clutter, and small solid circles remain hard to see. Selective annotations leave some identification work to the list. Linear comparison bars can compress small quantities beside very large ones. Source quantities can describe accounts, documents, or images, so comparisons are imperfect. Values have not all been independently verified, and this curated collection cannot establish worldwide breach incidence or industry risk. No user study was conducted; the claimed benefits are design arguments, not measured performance improvements.</p>
-  </section>
-
-  <footer class="report-references">
-    <h3>References</h3>
-    <ol>
-      <li>Information Is Beautiful. <a href="https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/" target="_blank" rel="noopener noreferrer"><cite>World’s Biggest Data Breaches &amp; Hacks</cite></a>. Design and concept: David McCandless; code: Tom Evans. Accessed September 25, 2026. Original visualization excerpt shown in Figure 1.</li>
-      <li>Information Is Beautiful. <a href="https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit" target="_blank" rel="noopener noreferrer"><cite>World’s Biggest Data Breaches</cite> source spreadsheet</a>. Accessed September 25, 2026. Includes event descriptions and links to underlying reports.</li>
-      <li><a href="data/breaches-source-2026-09-25.csv">Archived source CSV</a>, downloaded September 25, 2026. See the <a href="data/README.md">data audit</a> for cleaning decisions and the <a href="data/breaches.json">external JSON</a> loaded by the D3 timeline.</li>
-    </ol>
-  </footer>
 
 </article>
