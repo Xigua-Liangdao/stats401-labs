@@ -1,6 +1,6 @@
 ---
 title: "Visualization Critique and Redesign: Data Breaches in Context"
-word_count: 745
+word_count: 737
 word_count_scope: "Body prose only; excludes section headings and references."
 ---
 
@@ -8,9 +8,9 @@ word_count_scope: "Body prose only; excludes section headings and references."
 
 I interpret Information Is Beautiful’s [“World’s Biggest Data Breaches & Hacks”](https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/) as a public overview of major reported breaches: readers notice their magnitude, locate familiar organizations, and investigate individual stories. This is an inference from its design, not an explicit author statement. My redesign preserves that overview while making dense periods and selected events easier to inspect and compare.
 
-Both D3 alternatives load the same external JSON derived from the original’s [linked spreadsheet](https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit). The September 25, 2026 snapshot retains 539 events across reporting years 2004–2026, including entries below the original graphic’s stated 30,000-record threshold. There are 499 usable numeric counts and 40 unknown, unresolved, or incompatible-unit entries. Year means when the story broke, not necessarily when the breach happened. Reported records are not unique people.
+The D3 bubble timeline loads an external JSON file derived from the original’s [linked spreadsheet](https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit). The September 25, 2026 snapshot retains 539 events across reporting years 2004–2026, including entries below the original graphic’s stated 30,000-record threshold. There are 499 usable numeric counts and 40 unknown, unresolved, or incompatible-unit entries. Year means when the story broke, not necessarily when the breach happened. Reported records are not unique people.
 
-The excluded group contains 11 explicitly unknown counts, 28 possible placeholder values lacking corroboration, and one count of systems rather than records. Exclusion is conservative: an unresolved value is not proof that the real quantity is unknown.
+The excluded counts comprise 11 explicitly unknown values, 28 possible placeholders lacking corroboration, and one count of systems rather than records. Exclusion is conservative: an unresolved value is not proof that the real quantity is unknown.
 
 ## Two strengths worth preserving
 
@@ -26,24 +26,24 @@ Third, events from an industry or cause are dispersed through the chronological 
 
 ## Design decisions
 
-First, both alternatives preserve chronology and provide a shared overview of source events by reporting year. Brushing a period, or entering its start and end years, focuses the main view while the full timeline remains visible. This separates context from detail without replacing the collection with a top-ten ranking. Search and category filters refine the same focus.
+First, the redesign retains circles with solid areas proportional to reported count and horizontal positions corresponding to reporting year. Vertical packing separates circles; vertical position has no data meaning. Outlined visibility rings make tiny events selectable without enlarging their encoded solid areas. A fixed area scale across focused periods preserves the meaning of size when the year window changes.
 
-Second, Alternative A preserves circles whose solid areas represent numeric counts. Vertical packing reduces overlap; vertical position has no data meaning. Outlined visibility rings make tiny events selectable without enlarging their encoded solid areas. This retains the original’s visual emphasis on magnitude, while acknowledging that small values still need labels or details.
+Second, a compact overview counts source events by reporting year. Brushing a period, or choosing its start and end years, focuses the main timeline while the full temporal context remains visible. Organization search and industry or cause filters refine that focus. This lets readers inspect dense periods while understanding where they fall within the collection.
 
-Third, Alternative B plots exact reporting year against count on a logarithmic vertical axis. Equal vertical steps represent equal ratios, allowing small and large events to coexist. Isolated events appear at their exact values. Dense, same-year events become numbered group badges with vertical spans showing their minimum and maximum counts. Badge numbers count events; badge midpoints are not individual measurements. Clicking reveals members and exact values in the list; a selected event receives an exact-position pin. This grouping reduces overlap, while logarithmic spacing supports ratio reading rather than absolute differences.
+Third, annotations identify major and selected events, with placement that avoids covering circle marks. Labeling selectively preserves room for the overview, while names and printed quantities in the result list provide a more systematic way to read individual cases. This is a deliberate division of work between visual discovery and explicit identification.
 
-Fourth, prominent labels identify major and selected events, while a named result list provides access to every matching case. Selecting an event reveals its value, story, and available sources. Filters and selected identities persist when switching alternatives, enabling comparison of the representations using the same evidence.
+Fourth, selecting a named event opens its reported quantity, story, and available source links. Pagination makes every matching entry accessible without placing hundreds of labels on the chart. The 40 events without usable counts remain in the named list and year overview, but receive no invented proportional bubble. Their count explanations remain available in the details.
 
-Fifth, readers can choose up to three numeric events for a secondary, zero-baseline linear bar comparison with printed values. This addresses the area-comparison problem without sacrificing the main overview. Entries with unusable counts remain accessible separately rather than receiving invented numeric positions. Short transitions help connect states; no autoplay is required to understand the chart.
+Fifth, readers can choose up to three numeric events for a secondary, zero-baseline linear bar comparison with printed values. This addresses the area-comparison problem while retaining the main timeline’s visual emphasis on magnitude. Brief transitions acknowledge changes in the display; understanding the result does not depend on autoplay or remembering an animation.
 
 ## Before, after, and limitations
 
-Figures 2 and 3 show two responses to Figure 1’s tradeoffs. Alternative A preserves visual impact; Alternative B makes time and magnitude coordinates more explicit. Shared focus controls and comparison bars support inspection in either view. Neither alternative is universally better.
+Figure 2 preserves Figure 1’s chronology and scale emphasis, while separating circles and adding focused inspection with a persistent overview. The accompanying list and comparison bars make selected names and values explicit. These changes support the original discovery task rather than redefining the project as a ranking alone.
 
-Packing increases display space, visibility rings add clutter, and logarithmic axes require explanation. Grouping hides individual positions until selection, while selective labels make the result list important. Numeric source quantities can describe accounts, documents, or images, so comparisons are imperfect. Source values have not all been independently verified, and this curated collection cannot establish worldwide breach incidence or industry risk. No user study was conducted; the claimed benefits are design arguments, not measured performance improvements.
+The tradeoffs remain. Packing can require more space, tiny-event rings add clutter, and small solid circles remain hard to see. Selective annotations leave some identification work to the list. Linear comparison bars can compress small quantities beside very large ones. Source quantities can describe accounts, documents, or images, so comparisons are imperfect. Values have not all been independently verified, and this curated collection cannot establish worldwide breach incidence or industry risk. No user study was conducted; the claimed benefits are design arguments, not measured performance improvements.
 
 ## References
 
 1. Information Is Beautiful. [*World’s Biggest Data Breaches & Hacks*](https://informationisbeautiful.net/visualizations/worlds-biggest-data-breaches-hacks/). Design and concept: David McCandless; code: Tom Evans. Accessed September 25, 2026. Original visualization excerpt shown in Figure 1.
 2. Information Is Beautiful. [*World’s Biggest Data Breaches* source spreadsheet](https://docs.google.com/spreadsheets/d/1i0oIJJMRG-7t1GT-mr4smaTTU7988yXVz8nPlwaJ8Xk/edit). Accessed September 25, 2026. Includes event descriptions and links to underlying reports.
-3. [Archived source CSV](data/breaches-source-2026-09-25.csv), downloaded September 25, 2026. See the [data audit](data/README.md) for cleaning decisions and the [external JSON](data/breaches.json) loaded by both D3 alternatives.
+3. [Archived source CSV](data/breaches-source-2026-09-25.csv), downloaded September 25, 2026. See the [data audit](data/README.md) for cleaning decisions and the [external JSON](data/breaches.json) loaded by the D3 timeline.

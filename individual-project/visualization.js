@@ -1,10 +1,12 @@
-/* D3 views share one filter, selection and comparison state. */
+/* Proportional bubble timeline with linked focus, details and comparison. */
 (async function () {
   'use strict';
   const $ = id => document.getElementById(id);
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const compact = n => n == null ? 'Count unavailable' : n >= 1e9 ? `${d3.format('.3~g')(n / 1e9)}B` : n >= 1e6 ? `${d3.format('.3~g')(n / 1e6)}M` : n >= 1e3 ? `${d3.format('.3~g')(n / 1e3)}k` : d3.format(',')(n);
   const label = e => `${e.recordsStatus === 'approximate' ? '≈ ' : ''}${compact(e.records)}`;
+  const url = new URL(location.href);
+  if (url.searchParams.has('view')) { url.searchParams.delete('view'); history.replaceState(null, '', url); }
   const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
   let data;
   try { data = await d3.json('data/breaches.json'); }
@@ -14,10 +16,10 @@
   const yearMin = d3.min(events, e => e.year), yearMax = d3.max(events, e => e.year);
   const initial = events.find(e => e.organization === 'National Public Data') || events[0];
   const ticket = events.find(e => e.organization === 'Ticketmaster' && e.year === 2024);
-  const state = {view:new URL(location.href).searchParams.get('view') === 'scatter' ? 'scatter' : 'bubbles', query:'', sector:'', method:'', start:yearMin, end:yearMax, selected:initial.id, compare:[initial.id, ticket?.id].filter(Boolean), page:0, order:'latest', group:null};
+  const state = {query:'', sector:'', method:'', start:yearMin, end:yearMax, selected:initial.id, compare:[initial.id, ticket?.id].filter(Boolean), page:0, order:'latest'};
   const colors = new Map([['Web','#247c78'],['Government','#5363a2'],['Health','#c86642'],['Retail','#ae853b'],['Finance','#9b597e'],['Other industries','#8b9787']]);
   const color = e => colors.get(e.sector) || colors.get('Other industries');
-  let focused = [], base = [], layout, xScale, yScale, renderedWidth = 0;
+  let focused = [], base = [], layout, xScale, renderedWidth = 0;
   let brush, brushGroup, overviewX, syncingBrush = false;
   const announce = message => { $('live-status').textContent = message; };
   const inFocus = e => focused.some(item => item.id === e.id);
@@ -43,17 +45,14 @@
     $('year-start').value = state.start;
     $('year-end').value = state.end;
     $('year-window').textContent = `${state.start}–${state.end}`;
-    document.querySelectorAll('[data-view]').forEach(button => button.setAttribute('aria-pressed', button.dataset.view === state.view));
-    $('view-title').textContent = state.view === 'bubbles' ? 'A · Bubble timeline' : 'B · Time × size';
-    $('view-description').textContent = state.view === 'bubbles'
-      ? 'One circle per numeric event. Solid area shows reported records; horizontal position shows the reporting year.'
-      : 'Year runs left to right. Higher means more reported records; each vertical step is 10×. Click a numbered group to see its events.';
+    $('view-title').textContent = 'Bubble timeline';
+    $('view-description').textContent = 'One circle per numeric event. Solid area shows reported records; horizontal position shows the reporting year.';
     drawMain(); drawOverview(); drawList(); drawDetails(); drawComparison();
   }
   function setYears(start, end) {
     state.start = Math.max(yearMin, Math.min(yearMax, start));
     state.end = Math.max(state.start, Math.min(yearMax, end));
-    state.page = 0; state.group = null; render();
+    state.page = 0; render();
     announce(`Focused on reporting years ${state.start} through ${state.end}. ${focused.length} events.`);
   }
   function selectEvent(id) {
@@ -72,60 +71,34 @@
     hideTooltip();
     const width = $('chart-stage').clientWidth;
     renderedWidth = width;
-    const options = {width,height:state.view === 'bubbles' ? 440 : 500,yearStart:state.start,yearEnd:state.end};
-    layout = state.view === 'bubbles' ? BreachLayouts.bubble(focused, options) : BreachLayouts.scatterGrouped(focused, options);
+    const options = {width,height:440,yearStart:state.start,yearEnd:state.end};
+    layout = BreachLayouts.bubble(focused, options);
     const {height,margins:m} = layout;
     xScale = d3.scaleLinear().domain(layout.xDomain).range([m.left,width-m.right]);
-    yScale = d3.scaleLog().domain([10,1e10]).range([height-m.bottom,m.top]);
-    const svg = d3.select('#main-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('data-view',state.view).attr('data-event-count',focused.filter(e=>e.records!=null).length);
+    const svg = d3.select('#main-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('data-view','bubbles').attr('data-event-count',focused.filter(e=>e.records!=null).length);
     svg.selectAll('g, text').remove();
     $('chart-title').textContent = `${$('view-title').textContent}, reporting years ${state.start}–${state.end}`;
-    $('chart-description').textContent = state.view === 'bubbles'
-      ? 'Circle solid area is proportional to reported records. Vertical position only separates events. Outlined tiny-event rings are visibility targets. Use the named event list below for keyboard access to every event.'
-      : 'Horizontal position is exact reporting year. Vertical position is logarithmic reported records, from ten to ten billion. Numbered badges group nearby same-year events; their lines show minimum to maximum values. Use the named list below to select individual events.';
+    $('chart-description').textContent = 'Circle solid area is proportional to reported records. Vertical position only separates events. Outlined tiny-event rings are visibility targets. Use the named event list below for keyboard access to every event.';
     const ticks = d3.range(state.start,state.end+1).filter((year,i) => (state.end-state.start <= 12) || i%2===0 || year===state.end);
     svg.append('g').attr('class','grid').selectAll('line').data(ticks).join('line').attr('x1',d=>xScale(d)).attr('x2',d=>xScale(d)).attr('y1',m.top).attr('y2',height-m.bottom);
-    if (state.view === 'scatter') {
-      const powers=d3.range(1,11).map(n=>10**n);
-      svg.append('g').attr('class','grid').selectAll('line').data(powers).join('line').attr('x1',m.left).attr('x2',width-m.right).attr('y1',yScale).attr('y2',yScale);
-      svg.append('g').attr('class','axis').attr('transform',`translate(${m.left},0)`).call(d3.axisLeft(yScale).tickValues(powers).tickFormat(compact).tickSize(0).tickPadding(10));
-      svg.append('text').attr('class','plot-label').attr('x',m.left).attr('y',13).text('Reported records · logarithmic scale');
-    } else svg.append('text').attr('class','plot-label').attr('x',m.left).attr('y',13).text('Vertical position separates events; it does not encode a variable.');
+    svg.append('text').attr('class','plot-label').attr('x',m.left).attr('y',13).text('Vertical position separates events; it does not encode a variable.');
     svg.append('g').attr('class','axis').attr('transform',`translate(0,${height-m.bottom})`).call(d3.axisBottom(xScale).tickValues(ticks).tickFormat(d3.format('d')).tickSize(4).tickPadding(7));
     svg.append('text').attr('class','plot-label').attr('x',width-m.right).attr('y',height-5).attr('text-anchor','end').text('Reporting year');
     const marks = svg.append('g').attr('class','marks');
-    if (state.view === 'bubbles') {
-      const nodes=marks.selectAll('g').data(layout.positions,d=>d.id).join('g').attr('class','bubble-event').attr('data-id',d=>d.id);
-      nodes.append('circle').attr('class','event-mark').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>d.trueRadius).attr('fill',d=>color(byId.get(d.id))).attr('fill-opacity',.85);
-      nodes.filter(d=>d.tiny).append('circle').attr('class','visibility-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',2.8).attr('fill','none').attr('stroke',d=>color(byId.get(d.id))).attr('stroke-width',1);
-      nodes.append('circle').attr('class','event-mark hit-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>Math.max(d.r,4.3)).attr('fill','transparent').on('click',(ev,d)=>selectEvent(d.id)).on('pointermove',(ev,d)=>{const e=byId.get(d.id);tooltip(ev,`<strong>${escape(e.organization)}</strong><br>${e.year} · ${label(e)} reported records<br>${escape(e.sector)} · ${escape(e.method)}<br>Click for the event story`);}).on('pointerleave',hideTooltip).append('title').text(d=>`${byId.get(d.id).organization}, ${d.year}, ${label(byId.get(d.id))}`);
-      drawSizeLegend();
-    } else {
-      $('size-legend').hidden = true;
-      const nodes=marks.selectAll('g').data(layout.positions,d=>d.id).join('g').attr('data-id',d=>d.id).attr('data-members',d=>d.members.join(',')).attr('data-count',d=>d.count).attr('class',d=>d.isGroup?'group-badge':'singleton');
-      nodes.filter(d=>d.isGroup).append('line').attr('x1',d=>d.x).attr('x2',d=>d.x).attr('y1',d=>d.yMin).attr('y2',d=>d.yMax);
-      nodes.append('circle').attr('class','event-mark').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>d.r).attr('fill',d=>d.isGroup?'#e3ebe0':color(byId.get(d.id)));
-      nodes.filter(d=>d.isGroup).append('text').attr('x',d=>d.x).attr('y',d=>d.y+3.3).attr('text-anchor','middle').text(d=>d.count);
-      nodes.on('click',(ev,d)=>{
-        if (d.isGroup) {state.group={members:d.members,year:d.year,min:d.minRecords,max:d.maxRecords};state.page=0;state.selected=d.members[0];drawMain();drawList();drawDetails();announce(`${d.count} events in ${d.year}. The named event list now shows this group's members.`);$('group-focus').scrollIntoView({block:'nearest',behavior:motion?'smooth':'auto'});}
-        else {state.group=null;selectEvent(d.id);}
-      }).on('pointermove',(ev,d)=>{
-        const e=byId.get(d.id);
-        tooltip(ev,d.isGroup?`<strong>${d.count} events · ${d.year}</strong><br>${compact(d.minRecords)}–${compact(d.maxRecords)} reported records<br>Line = minimum to maximum; number = events<br>Click to inspect every member`:`<strong>${escape(e.organization)}</strong><br>${e.year} · ${label(e)} reported records<br>${escape(e.sector)} · Click for details`);
-      }).on('pointerleave',hideTooltip);
-      nodes.append('title').text(d=>d.isGroup?`${d.count} events in ${d.year}, ${compact(d.minRecords)} to ${compact(d.maxRecords)} records. Click to list members.`:`${byId.get(d.id).organization}, ${label(byId.get(d.id))}`);
-    }
-    // Pin the selected individual at its exact coordinate in B, even inside a group.
+    const nodes=marks.selectAll('g').data(layout.positions,d=>d.id).join('g').attr('class','bubble-event').attr('data-id',d=>d.id);
+    nodes.append('circle').attr('class','event-mark').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>d.trueRadius).attr('fill',d=>color(byId.get(d.id))).attr('fill-opacity',.85);
+    nodes.filter(d=>d.tiny).append('circle').attr('class','visibility-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',2.8).attr('fill','none').attr('stroke',d=>color(byId.get(d.id))).attr('stroke-width',1);
+    nodes.append('circle').attr('class','event-mark hit-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>Math.max(d.r,4.3)).attr('fill','transparent').on('click',(ev,d)=>selectEvent(d.id)).on('pointermove',(ev,d)=>{const e=byId.get(d.id);tooltip(ev,`<strong>${escape(e.organization)}</strong><br>${e.year} · ${label(e)} reported records<br>${escape(e.sector)} · ${escape(e.method)}<br>Click for the event story`);}).on('pointerleave',hideTooltip).append('title').text(d=>`${byId.get(d.id).organization}, ${d.year}, ${label(byId.get(d.id))}`);
+    drawSizeLegend();
+    // Outline the selected event without changing its encoded area.
     const selected=byId.get(state.selected);
     if(selected && selected.records != null && inFocus(selected)) {
-      const p=state.view==='bubbles'?layout.positions.find(d=>d.id===selected.id):{x:xScale(selected.year),y:yScale(selected.records),r:6};
-      svg.append('g').attr('class','selected-pin').attr('data-id',selected.id).append('circle').attr('class','selection-ring').attr('cx',p.x).attr('cy',p.y).attr('r',state.view==='bubbles'?p.r+4:7);
+      const p=layout.positions.find(d=>d.id===selected.id);
+      svg.append('g').attr('class','selected-pin').attr('data-id',selected.id).append('circle').attr('class','selection-ring').attr('cx',p.x).attr('cy',p.y).attr('r',p.r+4);
     }
     drawAnnotations(svg);
     const unknown=focused.filter(e=>e.records==null).length;
-    $('encoding-note').textContent=state.view==='bubbles'
-      ? `Solid area ∝ reported count, with a fixed scale across year windows. ${layout.tinyCount} tiny events have outlined visibility rings; ring size does not encode count. ${unknown} events without comparable counts remain in the list and overview.`
-      : `Numbered groups = nearby events in one year; vertical spans show their min–max counts, not uncertainty. The orange pin marks the selected event exactly. ${unknown} events without comparable counts remain in the list and overview.`;
+    $('encoding-note').textContent = `Solid area ∝ reported count, with a fixed scale across year windows. ${layout.tinyCount} tiny events have outlined visibility rings; ring size does not encode count. ${unknown} events without comparable counts remain in the list and overview.`;
     $('empty-state').hidden=layout.positions.length>0;
     $('empty-state').textContent=focused.length?'These events have no comparable numeric count. Read them in the list below.':'No events match this selection.';
     if(motion) marks.attr('opacity',.4).transition().duration(motion).attr('opacity',1);
@@ -146,7 +119,7 @@
     const used=[];
     const layer=svg.append('g').attr('class','annotations');
     for (const e of top) {
-      const p=state.view==='bubbles'?layout.positions.find(d=>d.id===e.id):{x:xScale(e.year),y:yScale(e.records),r:8};
+      const p=layout.positions.find(d=>d.id===e.id);
       if(!p)continue;
       const name=e.organization.length>32?`${e.organization.slice(0,30)}…`:e.organization;
       const w=Math.max(116,Math.min(202,name.length*5.8+18)),h=37;
@@ -198,15 +171,12 @@
     syncingBrush=true;brushGroup.call(brush.move,[overviewX(state.start-.5),overviewX(state.end+.5)]);syncingBrush=false;
   }
   function listData() {
-    let list=focused;
-    if(state.group)list=list.filter(e=>state.group.members.includes(e.id));
+    const list=focused;
     return list.slice().sort(state.order==='name'?(a,b)=>a.organization.localeCompare(b.organization)||b.year-a.year:state.order==='largest'?(a,b)=>(b.records??-1)-(a.records??-1)||b.year-a.year:(a,b)=>b.year-a.year||(b.records??-1)-(a.records??-1));
   }
   function drawList() {
     const list=listData(),pageSize=6,pages=Math.max(1,Math.ceil(list.length/pageSize));
     state.page=Math.min(state.page,pages-1);
-    $('group-focus').hidden=!state.group;$('clear-group').hidden=!state.group;
-    if(state.group)$('group-focus').textContent=`Showing ${list.length} members of a ${state.group.year} group · ${compact(state.group.min)}–${compact(state.group.max)} reported records. Select a name to locate its exact value.`;
     $('event-list').innerHTML=list.slice(state.page*pageSize,(state.page+1)*pageSize).map(e=>`<button class="event-list-row" data-id="${escape(e.id)}" aria-pressed="${state.selected===e.id}"><span><strong>${escape(e.organization)}</strong><small>${e.year} · ${escape(e.sector)} · ${escape(e.method)}</small></span><span>${label(e)}</span></button>`).join('')||'<p class="detail-meta">No matching events in this list.</p>';
     $('event-list').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>selectEvent(button.dataset.id)));
     $('page-status').textContent=`${list.length?state.page*pageSize+1:0}–${Math.min((state.page+1)*pageSize,list.length)} of ${list.length}`;
@@ -245,14 +215,9 @@
     svg.append('g').attr('class','axis').attr('transform',`translate(0,${height-37})`).call(d3.axisBottom(x).ticks(width<500?3:6).tickFormat(compact).tickSize(4));
     svg.append('text').attr('x',width-10).attr('y',height-5).attr('font-size',10).attr('text-anchor','end').attr('fill','#65756f').text('Reported records · linear scale, starting at zero');
   }
-  document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
-    state.view=button.dataset.view;state.group=null;
-    const url=new URL(location.href);url.searchParams.set('view',state.view);history.replaceState(null,'',url);
-    render();announce(`${state.view==='bubbles'?'Bubble timeline':'Time by size'} view. Filters and selected events retained.`);
-  }));
   let inputTimer;
-  $('search').addEventListener('input',()=>{clearTimeout(inputTimer);inputTimer=setTimeout(()=>{state.query=$('search').value;state.page=0;state.group=null;render();},120);});
-  [['sector-filter','sector'],['method-filter','method']].forEach(([id,key])=>$(id).addEventListener('change',()=>{state[key]=$(id).value;state.page=0;state.group=null;render();}));
+  $('search').addEventListener('input',()=>{clearTimeout(inputTimer);inputTimer=setTimeout(()=>{state.query=$('search').value;state.page=0;render();},120);});
+  [['sector-filter','sector'],['method-filter','method']].forEach(([id,key])=>$(id).addEventListener('change',()=>{state[key]=$(id).value;state.page=0;render();}));
   $('year-start').addEventListener('change',()=>setYears(+$('year-start').value,Math.max(+$('year-start').value,state.end)));
   $('year-end').addEventListener('change',()=>setYears(Math.min(state.start,+$('year-end').value),+$('year-end').value));
   $('all-years').addEventListener('click',()=>setYears(yearMin,yearMax));
@@ -260,7 +225,6 @@
   $('list-order').addEventListener('change',()=>{state.order=$('list-order').value;state.page=0;drawList();});
   $('prev-page').addEventListener('click',()=>{state.page--;drawList();});
   $('next-page').addEventListener('click',()=>{state.page++;drawList();});
-  $('clear-group').addEventListener('click',()=>{state.group=null;state.page=0;drawList();});
   $('clear-comparison').addEventListener('click',()=>{state.compare=[];drawDetails();drawComparison();announce('Comparison cleared.');});
   render();
   let resizeTimer;

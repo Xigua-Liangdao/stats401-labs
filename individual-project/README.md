@@ -6,23 +6,21 @@ This project preserves the original visualization’s public overview of major r
 
 ## Deliverables
 
-- [Interactive project and 745-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
+- [Interactive project and 737-word report](https://xigua-liangdao.github.io/stats401-labs/individual-project/)
 - [One-page presentation PDF](assets/Teresa_Tu.pdf)
 - [One-minute speaking script](presentation-notes.md)
 - [Assignment requirements and verification](requirement-checklist.md)
 - [Source data and cleaning audit](data/README.md)
 
-## Two alternatives, shared context
+## Bubble timeline with focus and context
 
-**A · Bubble timeline** places events at their reporting year and makes solid circle area proportional to reported count. Vertical packing separates circles; vertical position has no data meaning. Tiny circles have outlined visibility rings, whose size does not encode count. The area scale stays fixed across focused year windows.
+Events sit at their reporting year. Solid circle area is proportional to reported count, with a fixed size scale across focused year windows. Vertical packing separates circles; vertical position has no data meaning. Tiny circles have outlined visibility rings, whose size does not encode count. Annotations identify major and selected events while avoiding the circle marks.
 
-**B · Time × size** uses reporting year horizontally and a logarithmic count axis vertically. Isolated events occupy exact source-value coordinates. Crowded same-year events form numbered badges: the number is the event count, and a vertical span shows the minimum and maximum reported quantities. A badge’s midpoint is not an individual event value. Clicking a badge opens its named members; a selected event receives a pin at its exact coordinate.
+A compact reporting-year overview retains the whole timeline. Brush a period or use the keyboard-accessible year controls to focus, then refine with organization search, industry, or cause. The named list includes every matching event, with pagination and ordering controls. Selecting an event opens its reported quantity, source story, count explanation, and available references.
 
-Both alternatives retain a full reporting-year overview. Brush the overview or use the keyboard-accessible year controls to focus, then refine with organization search, industry, or cause. The named list includes every matching event, with pagination and ordering controls. Event details retain the source story and available references. Switching alternatives preserves filters, the focused years, and selected events.
+A secondary linear bar chart compares up to three chosen numeric events from a common zero baseline. The initial example contains National Public Data and Ticketmaster. Entries without usable counts remain in the year overview and named list; they receive no invented proportional bubble and cannot be added to the numeric comparison.
 
-A secondary linear bar chart compares up to three chosen numeric events from a common zero baseline. The initial example contains National Public Data and Ticketmaster. Entries without usable counts remain in the year overview and named list; they receive no invented numeric position and cannot be added to the numeric comparison.
-
-The page uses locally pinned D3.js v7.9.0 and loads `data/breaches.json` externally. Source CSV, audit, report, screenshots, scripts, and vendor library are included. The original image is a labeled excerpt; the two redesign screenshots use the same 2022–2026 focus window. Mobile layouts retain readable chart geometry through an intentional horizontal chart scroller.
+The page uses locally pinned D3.js v7.9.0 and loads `data/breaches.json` externally. Source CSV, audit, report, screenshots, scripts, and vendor library are included. Figure 1 is a labeled excerpt of the original visualization; Figure 2 shows the implemented bubble timeline focused on 2022–2026. Mobile layouts retain readable chart geometry through an intentional horizontal chart scroller.
 
 ## Run locally
 
@@ -32,7 +30,7 @@ From the course repository root:
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000/individual-project/`. A local server is required for the external JSON request; opening `index.html` as a file is insufficient. Add `?view=scatter` to open B directly or `?view=bubbles` for A.
+Open `http://localhost:8000/individual-project/`. A local server is required for the external JSON request; opening `index.html` as a file is insufficient.
 
 ## Reproduce data
 
