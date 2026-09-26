@@ -1,180 +1,268 @@
-/* Data Breaches, Compared — D3 7.9.0, external frozen JSON.
-   A linear, zero-based ranking with persistent event IDs and printed values. */
-(() => {
+/* D3 views share one filter, selection and comparison state. */
+(async function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const PAGE_SIZE = 10;
-  const state = { events: [], filtered: [], numeric: [], unranked: [], page: 0, selected: null, sector: '', method: '', search: '' };
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const exact = d3.format(',');
-  const compact = n => n >= 1e9 ? `${d3.format('.3~g')(n / 1e9)}B` : n >= 1e6 ? `${d3.format('.3~g')(n / 1e6)}M` : n >= 1e3 ? `${d3.format('.3~g')(n / 1e3)}k` : exact(n);
-  const count = d => d.records === null ? d.recordsLabel : `${d.recordsStatus === 'approximate' ? '≈ ' : ''}${exact(d.records)}`;
-  const brief = d => `${d.recordsStatus === 'approximate' ? '≈ ' : ''}${compact(d.records)}`;
-  const safeUrl = value => { try { const u = new URL(value); return /^https?:$/.test(u.protocol) ? u.href : null; } catch { return null; } };
-  const svg = d3.select('#rank-chart');
-  svg.select('title').attr('id', 'rank-svg-title');
-  svg.select('desc').attr('id', 'rank-svg-description');
-  const grid = svg.append('g').attr('class', 'rank-grid');
-  const axis = svg.append('g').attr('class', 'rank-axis');
-  const rows = svg.append('g').attr('class', 'rank-rows');
-  let resizeTimer, lastWidth = 0;
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const compact = n => n == null ? 'Count unavailable' : n >= 1e9 ? `${d3.format('.3~g')(n / 1e9)}B` : n >= 1e6 ? `${d3.format('.3~g')(n / 1e6)}M` : n >= 1e3 ? `${d3.format('.3~g')(n / 1e3)}k` : d3.format(',')(n);
+  const label = e => `${e.recordsStatus === 'approximate' ? '≈ ' : ''}${compact(e.records)}`;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
+  let data;
+  try { data = await d3.json('data/breaches.json'); }
+  catch (error) { $('result-count').textContent = 'Data could not be loaded. Please refresh.'; console.error(error); return; }
+  const events = data.events;
+  const byId = new Map(events.map(e => [e.id, e]));
+  const yearMin = d3.min(events, e => e.year), yearMax = d3.max(events, e => e.year);
+  const initial = events.find(e => e.organization === 'National Public Data') || events[0];
+  const ticket = events.find(e => e.organization === 'Ticketmaster' && e.year === 2024);
+  const state = {view:new URL(location.href).searchParams.get('view') === 'scatter' ? 'scatter' : 'bubbles', query:'', sector:'', method:'', start:yearMin, end:yearMax, selected:initial.id, compare:[initial.id, ticket?.id].filter(Boolean), page:0, order:'latest', group:null};
+  const colors = new Map([['Web','#247c78'],['Government','#5363a2'],['Health','#c86642'],['Retail','#ae853b'],['Finance','#9b597e'],['Other industries','#8b9787']]);
+  const color = e => colors.get(e.sector) || colors.get('Other industries');
+  let focused = [], base = [], layout, xScale, yScale, renderedWidth = 0;
+  let brush, brushGroup, overviewX, syncingBrush = false;
+  const announce = message => { $('live-status').textContent = message; };
+  const inFocus = e => focused.some(item => item.id === e.id);
+  function baseMatch(e) {
+    const query = state.query.toLowerCase().trim();
+    return (!state.sector || e.sector === state.sector) && (!state.method || e.method === state.method)
+      && (!query || `${e.organization} ${e.sector} ${e.method}`.toLowerCase().includes(query));
+  }
+  function populate(select, values) {
+    values.forEach(value => select.add(new Option(value, value)));
+  }
+  populate($('sector-filter'), [...new Set(events.map(e => e.sector))].sort());
+  populate($('method-filter'), [...new Set(events.map(e => e.method))].sort());
+  ['year-start','year-end'].forEach(id => populate($(id), d3.range(yearMin, yearMax + 1)));
+  $('sector-legend').innerHTML = [...colors].map(([name,fill]) => `<span class="legend-item"><span class="legend-dot" style="background:${fill}"></span>${name}</span>`).join('');
+  $('data-audit-note').textContent = 'The snapshot retains 539 source events, including below-threshold entries. Of these, 499 have usable numeric counts. The other 40 comprise 11 explicitly unknown values, 28 uncorroborated possible placeholders, and one count of systems rather than records. Treat unresolved values as uncertain, not proven unknown. Seventeen numeric labels are approximate.';
 
-  function matches(d) {
-    return (!state.sector || d.sector === state.sector) && (!state.method || d.method === state.method) && (!state.search || d.searchText.includes(state.search));
+  function render() {
+    base = events.filter(baseMatch);
+    focused = base.filter(e => e.year >= state.start && e.year <= state.end);
+    $('result-count').textContent = `${focused.length} events in focus · ${events.length} in the source collection`;
+    $('focus-summary').textContent = `${state.start}–${state.end} · ${focused.filter(e => e.records != null).length} numeric events · ${focused.filter(e => e.records == null).length} without a comparable count`;
+    $('year-start').value = state.start;
+    $('year-end').value = state.end;
+    $('year-window').textContent = `${state.start}–${state.end}`;
+    document.querySelectorAll('[data-view]').forEach(button => button.setAttribute('aria-pressed', button.dataset.view === state.view));
+    $('view-title').textContent = state.view === 'bubbles' ? 'A · Bubble timeline' : 'B · Time × size';
+    $('view-description').textContent = state.view === 'bubbles'
+      ? 'One circle per numeric event. Solid area shows reported records; horizontal position shows the reporting year.'
+      : 'Year runs left to right. Higher means more reported records; each vertical step is 10×. Click a numbered group to see its events.';
+    drawMain(); drawOverview(); drawList(); drawDetails(); drawComparison();
   }
-  function node(tag, cls, text, parent) {
-    const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; if (parent) parent.appendChild(n); return n;
+  function setYears(start, end) {
+    state.start = Math.max(yearMin, Math.min(yearMax, start));
+    state.end = Math.max(state.start, Math.min(yearMax, end));
+    state.page = 0; state.group = null; render();
+    announce(`Focused on reporting years ${state.start} through ${state.end}. ${focused.length} events.`);
   }
-  function wrap(text, max) {
-    const result = []; let line = '';
-    for (const word of text.split(/\s+/)) {
-      if (line && (line.length + word.length + 1) > max) { result.push(line); line = ''; }
-      if (word.length > max) {
-        if (line) { result.push(line); line = ''; }
-        for (let k = 0; k < word.length; k += max) result.push(word.slice(k, k + max));
-      } else line += (line ? ' ' : '') + word;
+  function selectEvent(id) {
+    state.selected = id; drawMain(); drawList(); drawDetails();
+    announce(`${byId.get(id).organization}, ${label(byId.get(id))}, selected.`);
+  }
+  function tooltip(event, html) {
+    const node = $('chart-tooltip');
+    node.innerHTML = html; node.hidden = false;
+    const [px,py] = d3.pointer(event, $('chart-stage'));
+    node.style.left = `${Math.min(layout.width - 265, Math.max(5, px + 15))}px`;
+    node.style.top = `${Math.max(5, py - 64)}px`;
+  }
+  function hideTooltip() { $('chart-tooltip').hidden = true; }
+  function drawMain() {
+    hideTooltip();
+    const width = $('chart-stage').clientWidth;
+    renderedWidth = width;
+    const options = {width,height:state.view === 'bubbles' ? 440 : 500,yearStart:state.start,yearEnd:state.end};
+    layout = state.view === 'bubbles' ? BreachLayouts.bubble(focused, options) : BreachLayouts.scatterGrouped(focused, options);
+    const {height,margins:m} = layout;
+    xScale = d3.scaleLinear().domain(layout.xDomain).range([m.left,width-m.right]);
+    yScale = d3.scaleLog().domain([10,1e10]).range([height-m.bottom,m.top]);
+    const svg = d3.select('#main-chart').attr('viewBox',`0 0 ${width} ${height}`).attr('data-view',state.view).attr('data-event-count',focused.filter(e=>e.records!=null).length);
+    svg.selectAll('g, text').remove();
+    $('chart-title').textContent = `${$('view-title').textContent}, reporting years ${state.start}–${state.end}`;
+    $('chart-description').textContent = state.view === 'bubbles'
+      ? 'Circle solid area is proportional to reported records. Vertical position only separates events. Outlined tiny-event rings are visibility targets. Use the named event list below for keyboard access to every event.'
+      : 'Horizontal position is exact reporting year. Vertical position is logarithmic reported records, from ten to ten billion. Numbered badges group nearby same-year events; their lines show minimum to maximum values. Use the named list below to select individual events.';
+    const ticks = d3.range(state.start,state.end+1).filter((year,i) => (state.end-state.start <= 12) || i%2===0 || year===state.end);
+    svg.append('g').attr('class','grid').selectAll('line').data(ticks).join('line').attr('x1',d=>xScale(d)).attr('x2',d=>xScale(d)).attr('y1',m.top).attr('y2',height-m.bottom);
+    if (state.view === 'scatter') {
+      const powers=d3.range(1,11).map(n=>10**n);
+      svg.append('g').attr('class','grid').selectAll('line').data(powers).join('line').attr('x1',m.left).attr('x2',width-m.right).attr('y1',yScale).attr('y2',yScale);
+      svg.append('g').attr('class','axis').attr('transform',`translate(${m.left},0)`).call(d3.axisLeft(yScale).tickValues(powers).tickFormat(compact).tickSize(0).tickPadding(10));
+      svg.append('text').attr('class','plot-label').attr('x',m.left).attr('y',13).text('Reported records · logarithmic scale');
+    } else svg.append('text').attr('class','plot-label').attr('x',m.left).attr('y',13).text('Vertical position separates events; it does not encode a variable.');
+    svg.append('g').attr('class','axis').attr('transform',`translate(0,${height-m.bottom})`).call(d3.axisBottom(xScale).tickValues(ticks).tickFormat(d3.format('d')).tickSize(4).tickPadding(7));
+    svg.append('text').attr('class','plot-label').attr('x',width-m.right).attr('y',height-5).attr('text-anchor','end').text('Reporting year');
+    const marks = svg.append('g').attr('class','marks');
+    if (state.view === 'bubbles') {
+      const nodes=marks.selectAll('g').data(layout.positions,d=>d.id).join('g').attr('class','bubble-event').attr('data-id',d=>d.id);
+      nodes.append('circle').attr('class','event-mark').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>d.trueRadius).attr('fill',d=>color(byId.get(d.id))).attr('fill-opacity',.85);
+      nodes.filter(d=>d.tiny).append('circle').attr('class','visibility-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',2.8).attr('fill','none').attr('stroke',d=>color(byId.get(d.id))).attr('stroke-width',1);
+      nodes.append('circle').attr('class','event-mark hit-target').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>Math.max(d.r,4.3)).attr('fill','transparent').on('click',(ev,d)=>selectEvent(d.id)).on('pointermove',(ev,d)=>{const e=byId.get(d.id);tooltip(ev,`<strong>${escape(e.organization)}</strong><br>${e.year} · ${label(e)} reported records<br>${escape(e.sector)} · ${escape(e.method)}<br>Click for the event story`);}).on('pointerleave',hideTooltip).append('title').text(d=>`${byId.get(d.id).organization}, ${d.year}, ${label(byId.get(d.id))}`);
+      drawSizeLegend();
+    } else {
+      $('size-legend').hidden = true;
+      const nodes=marks.selectAll('g').data(layout.positions,d=>d.id).join('g').attr('data-id',d=>d.id).attr('data-members',d=>d.members.join(',')).attr('data-count',d=>d.count).attr('class',d=>d.isGroup?'group-badge':'singleton');
+      nodes.filter(d=>d.isGroup).append('line').attr('x1',d=>d.x).attr('x2',d=>d.x).attr('y1',d=>d.yMin).attr('y2',d=>d.yMax);
+      nodes.append('circle').attr('class','event-mark').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',d=>d.r).attr('fill',d=>d.isGroup?'#e3ebe0':color(byId.get(d.id)));
+      nodes.filter(d=>d.isGroup).append('text').attr('x',d=>d.x).attr('y',d=>d.y+3.3).attr('text-anchor','middle').text(d=>d.count);
+      nodes.on('click',(ev,d)=>{
+        if (d.isGroup) {state.group={members:d.members,year:d.year,min:d.minRecords,max:d.maxRecords};state.page=0;state.selected=d.members[0];drawMain();drawList();drawDetails();announce(`${d.count} events in ${d.year}. The named event list now shows this group's members.`);$('group-focus').scrollIntoView({block:'nearest',behavior:motion?'smooth':'auto'});}
+        else {state.group=null;selectEvent(d.id);}
+      }).on('pointermove',(ev,d)=>{
+        const e=byId.get(d.id);
+        tooltip(ev,d.isGroup?`<strong>${d.count} events · ${d.year}</strong><br>${compact(d.minRecords)}–${compact(d.maxRecords)} reported records<br>Line = minimum to maximum; number = events<br>Click to inspect every member`:`<strong>${escape(e.organization)}</strong><br>${e.year} · ${label(e)} reported records<br>${escape(e.sector)} · Click for details`);
+      }).on('pointerleave',hideTooltip);
+      nodes.append('title').text(d=>d.isGroup?`${d.count} events in ${d.year}, ${compact(d.minRecords)} to ${compact(d.maxRecords)} records. Click to list members.`:`${byId.get(d.id).organization}, ${label(byId.get(d.id))}`);
     }
-    if (line) result.push(line);
-    return result.length ? result : ['Unnamed event'];
+    // Pin the selected individual at its exact coordinate in B, even inside a group.
+    const selected=byId.get(state.selected);
+    if(selected && selected.records != null && inFocus(selected)) {
+      const p=state.view==='bubbles'?layout.positions.find(d=>d.id===selected.id):{x:xScale(selected.year),y:yScale(selected.records),r:6};
+      svg.append('g').attr('class','selected-pin').attr('data-id',selected.id).append('circle').attr('class','selection-ring').attr('cx',p.x).attr('cy',p.y).attr('r',state.view==='bubbles'?p.r+4:7);
+    }
+    drawAnnotations(svg);
+    const unknown=focused.filter(e=>e.records==null).length;
+    $('encoding-note').textContent=state.view==='bubbles'
+      ? `Solid area ∝ reported count, with a fixed scale across year windows. ${layout.tinyCount} tiny events have outlined visibility rings; ring size does not encode count. ${unknown} events without comparable counts remain in the list and overview.`
+      : `Numbered groups = nearby events in one year; vertical spans show their min–max counts, not uncertainty. The orange pin marks the selected event exactly. ${unknown} events without comparable counts remain in the list and overview.`;
+    $('empty-state').hidden=layout.positions.length>0;
+    $('empty-state').textContent=focused.length?'These events have no comparable numeric count. Read them in the list below.':'No events match this selection.';
+    if(motion) marks.attr('opacity',.4).transition().duration(motion).attr('opacity',1);
   }
-  function selectEvent(d) {
-    state.selected = d.id;
-    renderDetail();
-    rows.selectAll('.rank-row').classed('is-selected', e => e.id === d.id).attr('aria-pressed', e => e.id === d.id);
-    rows.selectAll('.rank-bar').attr('fill', e => e.id === d.id ? '#c75b37' : '#257b78');
-    document.querySelectorAll('.unranked-event').forEach(el => el.setAttribute('aria-pressed', el.dataset.eventId === d.id));
-    $('live-status').textContent = `${d.organization}, ${d.year}. ${count(d)}${d.records !== null ? ' reported records' : ''}. Source details updated below the chart.`;
-  }
-  function renderDetail() {
-    const target = $('selection-detail'); target.replaceChildren();
-    const d = state.filtered.find(e => e.id === state.selected);
-    if (!d) { node('p', 'detail-kicker', 'EVENT DETAILS', target); node('h3', 'detail-heading', 'Select a named row to read its source.', target); return; }
-    node('p', 'detail-kicker', `SELECTED EVENT · REPORTED ${d.year}`, target);
-    const top = node('div', 'detail-top', undefined, target);
-    node('h3', 'detail-heading', d.organization, top);
-    node('p', 'detail-value', `${count(d)}${d.records !== null ? ' reported records' : ''}`, top);
-    node('p', 'detail-meta', `${d.sector} · ${d.method}`, target);
-    if (d.recordsNote) node('p', 'detail-caveat', d.recordsNote, target);
-    node('p', 'detail-story', d.story || 'No event narrative was supplied in the source spreadsheet.', target);
-    const links = node('div', 'detail-sources', undefined, target);
-    node('span', '', 'Source: ', links);
-    let total = 0;
-    (d.sources || []).forEach((s, i) => { const url = safeUrl(s.url); if (!url) return; const a = node('a', '', `${s.name || `Article ${i + 1}`} ↗`, links); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; total++; });
-    if (!total) node('span', '', 'No article link supplied; see the source spreadsheet.', links);
-    node('p', 'detail-raw', `Original classifications: ${d.sectorRaw || d.sector} / ${d.methodRaw || d.method}. Reporting year is the source's “year story broke”.`, target);
-  }
-  function renderRanking() {
-    const w = Math.max(260, Math.floor($('rank-stage').clientWidth)); lastWidth = w;
-    const narrow = w < 650;
-    const left = narrow ? 0 : Math.min(270, Math.max(212, Math.round(w * .26)));
-    const right = narrow ? 10 : 144;
-    const plotWidth = Math.max(80, w - left - right);
-    const max = d3.max(state.numeric, d => d.records) || 1;
-    const x = d3.scaleLinear().domain([0, max]).nice(4).range([left, left + plotWidth]);
-    const page = state.numeric.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE);
-    let y = 50;
-    const data = page.map((d, i) => {
-      const maxChars = narrow ? Math.max(17, Math.floor((w - 115) / 6.5)) : Math.floor((left - 48) / 7.1);
-      const lines = wrap(d.organization, maxChars);
-      const height = narrow ? Math.max(75, lines.length * 17 + 50) : Math.max(57, lines.length * 17 + 26);
-      const row = { ...d, lines, y, height, rank: state.page * PAGE_SIZE + i + 1 }; y += height; return row;
-    });
-    const h = page.length ? y + 9 : 70;
-    svg.style('display', page.length ? null : 'none').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'group').attr('aria-labelledby', 'rank-svg-title rank-svg-description');
-    svg.select('#rank-svg-title').text(`Reported breach sizes, ranks ${state.page * 10 + 1}–${state.page * 10 + page.length} of ${state.numeric.length}`);
-    svg.select('#rank-svg-description').text('Horizontal bar lengths show source-reported records on a linear axis starting at zero. Each row prints its organization, reporting year, and value. Activate a row to show its sources below.');
-    axis.attr('transform', 'translate(0,32)').call(d3.axisTop(x).ticks(narrow ? 3 : 4).tickSize(0).tickPadding(9).tickFormat(compact));
-    axis.select('.domain').attr('stroke', '#aabbb7');
-    axis.selectAll('text').attr('fill', '#526561').attr('font-size', narrow ? 10 : 11);
-    grid.selectAll('line').data(x.ticks(narrow ? 3 : 4)).join('line').attr('x1', d => x(d)).attr('x2', d => x(d)).attr('y1', 36).attr('y2', h).attr('stroke', '#e2e8e2').attr('stroke-dasharray', d => d === 0 ? null : '2 4');
-    const join = rows.selectAll('g.rank-row').data(data, d => d.id);
-    join.exit().interrupt().remove();
-    const enter = join.enter().append('g').attr('class', 'rank-row').attr('tabindex', 0).attr('role', 'button').attr('transform', d => `translate(0,${d.y})`);
-    enter.append('rect').attr('class', 'rank-hit');
-    enter.append('line').attr('class', 'rank-rule');
-    enter.append('text').attr('class', 'rank-index');
-    enter.append('text').attr('class', 'rank-name');
-    enter.append('text').attr('class', 'rank-meta');
-    enter.append('rect').attr('class', 'rank-bar').attr('width', 0).attr('rx', 2);
-    enter.append('text').attr('class', 'rank-value');
-    const merged = enter.merge(join).order().attr('aria-label', d => `Rank ${d.rank}. ${d.organization}, ${d.year}. ${count(d)} reported records. Read source details.`).attr('aria-pressed', d => d.id === state.selected).classed('is-selected', d => d.id === state.selected)
-      .on('click', (_, d) => selectEvent(d)).on('keydown', (event, d) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectEvent(d); } });
-    merged.interrupt().transition().duration(motion.matches ? 0 : 380).attr('transform', d => `translate(0,${d.y})`);
-    merged.select('.rank-hit').attr('x', 0).attr('y', -4).attr('width', w).attr('height', d => d.height - 2).attr('fill', 'transparent').attr('rx', 4);
-    merged.select('.rank-rule').attr('x1', 0).attr('x2', w).attr('y1', d => d.height - 4).attr('y2', d => d.height - 4).attr('stroke', '#e3e7e0');
-    merged.select('.rank-index').attr('x', 0).attr('y', 16).attr('fill', '#7c8c88').attr('font-size', 11).text(d => String(d.rank).padStart(2, '0'));
-    merged.select('.rank-name').attr('x', 29).attr('y', 16).attr('fill', '#19332f').attr('font-size', narrow ? 12 : 14).attr('font-weight', 650).each(function (d) {
-      d3.select(this).selectAll('tspan').data(d.lines).join('tspan').attr('x', 29).attr('dy', (_, i) => i ? 17 : 0).text(t => t);
-    });
-    merged.select('.rank-meta').attr('x', 29).attr('y', d => d.lines.length * 17 + 15).attr('fill', '#71807b').attr('font-size', 10).text(d => narrow ? `${d.year}` : `${d.year} · ${d.sector}`);
-    merged.select('.rank-bar').attr('x', x(0)).attr('y', d => narrow ? d.lines.length * 17 + 27 : Math.round((d.height - 24) / 2) - 1).attr('height', narrow ? 12 : 22).attr('fill', d => d.id === state.selected ? '#c75b37' : '#257b78').interrupt().transition().duration(motion.matches ? 0 : 450).attr('width', d => x(d.records) - x(0));
-    merged.select('.rank-value').attr('x', w - 3).attr('y', d => narrow ? 17 : Math.round(d.height / 2) + 3).attr('text-anchor', 'end').attr('fill', '#19332f').attr('font-size', narrow ? 10 : 13).attr('font-weight', 700).text(count);
-    $('empty-state').hidden = page.length > 0;
-    $('empty-state').textContent = state.filtered.length ? 'No comparable numeric counts in this selection. The named events are listed below.' : 'No events match. Try another name or reset the filters.';
-    $('rank-stage').classList.toggle('is-empty', page.length === 0);
-    $('prev-page').disabled = state.page === 0;
-    $('next-page').disabled = (state.page + 1) * PAGE_SIZE >= state.numeric.length;
-    $('page-status').textContent = page.length ? `Showing ${state.page * 10 + 1}–${state.page * 10 + page.length} of ${state.numeric.length} ranked events` : 'No ranked events';
-  }
-  function renderSummary(key, targetId) {
-    const container = $(targetId); container.replaceChildren();
-    const groups = d3.rollups(state.filtered, v => v.length, d => d[key]).sort((a, b) => d3.descending(a[1], b[1]) || d3.ascending(a[0], b[0]));
-    if (!groups.length) { node('p', 'summary-empty', 'No matching events.', container); return; }
-    const max = Math.max(...['sector', 'method'].flatMap(k => d3.rollups(state.filtered, v => v.length, d => d[k]).map(g => g[1])));
-    const makeButton = ([label, n], parent) => {
-      const btn = node('button', 'summary-row', undefined, parent); btn.type = 'button'; btn.setAttribute('aria-pressed', state[key] === label); btn.setAttribute('aria-label', `Filter ${key === 'sector' ? 'industry' : 'cause'}: ${label}, ${n} events`);
-      const line = node('span', 'summary-line', undefined, btn);
-      node('span', 'summary-label', label, line); node('span', 'summary-count', String(n), line);
-      const track = node('span', 'summary-track', undefined, btn); const fill = node('span', 'summary-fill', undefined, track); fill.style.width = `${n / max * 100}%`;
-      btn.addEventListener('click', () => { state[key] = state[key] === label ? '' : label; $(key === 'sector' ? 'sector-filter' : 'method-filter').value = state[key]; update(true); $('ranking-title').scrollIntoView({ behavior: motion.matches ? 'auto' : 'smooth', block: 'start' }); });
-    };
-    groups.slice(0, 5).forEach(g => makeButton(g, container));
-    if (groups.length > 5) { const more = node('details', 'summary-more', undefined, container); node('summary', '', `Show ${groups.length - 5} more ${key === 'sector' ? (groups.length === 6 ? 'industry' : 'industries') : (groups.length === 6 ? 'cause' : 'causes')}`, more); groups.slice(5).forEach(g => makeButton(g, more)); }
-  }
-  function renderUnranked() {
-    $('unranked-title').textContent = `${state.unranked.length} matching event${state.unranked.length === 1 ? '' : 's'} without a comparable record count`;
-    const list = $('unranked-list'); list.replaceChildren();
-    if (!state.unranked.length) { node('p', '', 'Every matching event has a numeric count.', list); return; }
-    state.unranked.slice().sort((a, b) => d3.ascending(a.organization, b.organization) || d3.ascending(a.year, b.year)).forEach(d => {
-      const button = node('button', 'unranked-event', undefined, list); button.type = 'button'; button.dataset.eventId = d.id; button.setAttribute('aria-pressed', d.id === state.selected);
-      node('strong', '', `${d.organization} · ${d.year}`, button); node('span', '', d.recordsLabel || 'No comparable count', button);
-      if (d.recordsNote) node('small', '', d.recordsNote, button);
-      button.addEventListener('click', () => { selectEvent(d); $('selection-detail').scrollIntoView({ behavior: motion.matches ? 'auto' : 'smooth', block: 'nearest' }); });
+  function drawSizeLegend() {
+    $('size-legend').hidden=false;
+    const legend=d3.select('#size-legend').html('').append('svg').attr('width',200).attr('height',68).attr('viewBox','0 0 200 68').attr('role','img').attr('aria-label','Solid bubble area key: one billion, one hundred million, and ten million records');
+    [1e9,1e8,1e7].forEach((n,i)=>{
+      const x=35+i*63,r=46*Math.sqrt(n/2.7e9);
+      legend.append('circle').attr('cx',x).attr('cy',32).attr('r',r).attr('fill','#247c78').attr('opacity',.6);
+      legend.append('text').attr('x',x).attr('y',67).attr('text-anchor','middle').attr('font-size',10).attr('fill','#607366').text(compact(n));
     });
   }
-  function update(resetPage = false) {
-    if (resetPage) state.page = 0;
-    state.filtered = state.events.filter(matches);
-    state.numeric = state.filtered.filter(d => Number.isFinite(d.records)).sort((a, b) => d3.descending(a.records, b.records) || d3.ascending(a.organization, b.organization) || d3.ascending(a.id, b.id));
-    state.unranked = state.filtered.filter(d => d.records === null);
-    state.page = Math.max(0, Math.min(state.page, Math.ceil(state.numeric.length / PAGE_SIZE) - 1));
-    const currentPage = state.numeric.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE);
-    if (!state.filtered.some(d => d.id === state.selected)) state.selected = currentPage[0]?.id || state.unranked[0]?.id || null;
-    $('result-count').textContent = `${state.filtered.length} of ${state.events.length} events`;
-    $('ranking-title').textContent = state.page ? 'Continue the ranking.' : 'Which reported breaches were largest?';
-    $('ranking-subtitle').textContent = 'Reported records · linear scale from zero · ≈ marks an approximate source count';
-    const leader = state.numeric[0];
-    $('ranking-summary').textContent = leader ? `${leader.organization} (${leader.year}) has the largest reported count in this selection: ${brief(leader)} records. ${state.unranked.length ? `${state.unranked.length} events cannot be ranked numerically.` : ''}` : 'No comparable record counts in this selection.';
-    renderRanking(); renderDetail(); renderSummary('sector', 'sector-summary'); renderSummary('method', 'method-summary'); renderUnranked();
-    $('live-status').textContent = `${state.filtered.length} matching events. ${$('page-status').textContent}. ${state.unranked.length} without comparable counts.`;
+  function drawAnnotations(svg) {
+    const top=focused.filter(e=>e.records!=null).sort((a,b)=>b.records-a.records).slice(0,3);
+    const selected=byId.get(state.selected);
+    if(selected?.records!=null && inFocus(selected) && !top.some(e=>e.id===selected.id)) top.push(selected);
+    const used=[];
+    const layer=svg.append('g').attr('class','annotations');
+    for (const e of top) {
+      const p=state.view==='bubbles'?layout.positions.find(d=>d.id===e.id):{x:xScale(e.year),y:yScale(e.records),r:8};
+      if(!p)continue;
+      const name=e.organization.length>32?`${e.organization.slice(0,30)}…`:e.organization;
+      const w=Math.max(116,Math.min(202,name.length*5.8+18)),h=37;
+      const offsets=[[p.r+9,-h/2],[-w-p.r-9,-h/2],[-w/2,-p.r-h-8],[-w/2,p.r+9],[p.r+8,-h-45],[-w-p.r-8,35]];
+      // Test nearby and progressively more distant boxes against every visible
+      // mark, so labels do not solve text crowding by covering other events.
+      for(const distance of [65,110,155,200,245,290,335]) {
+        for(const dx of [-w/2,p.r+9,-w-p.r-9]) offsets.push([dx,-h-distance],[dx,distance]);
+      }
+      const candidates=offsets.map(([dx,dy])=>({x:Math.max(66,Math.min(layout.width-w-5,p.x+dx)),y:Math.max(22,Math.min(layout.height-h-47,p.y+dy))}));
+      const overlaps=(a,b)=>a.x<b.x+b.w+5&&a.x+w+5>b.x&&a.y<b.y+b.h+4&&a.y+h+4>b.y;
+      const score=q=>{
+        const covered=layout.positions.filter(mark=>{
+          const nx=Math.max(q.x,Math.min(q.x+w,mark.x));
+          const ny=Math.max(q.y,Math.min(q.y+h,mark.y));
+          return Math.hypot(mark.x-nx,mark.y-ny)<mark.r+3;
+        }).length;
+        return used.filter(b=>overlaps(q,b)).length*100000+covered*10000+Math.hypot(q.x+w/2-p.x,q.y+h/2-p.y);
+      };
+      const q=candidates.map((q,i)=>({...q,cost:score(q)+i*.001})).sort((a,b)=>a.cost-b.cost)[0];
+      used.push({...q,w,h});
+      const g=layer.append('g').attr('class','annotation').attr('data-id',e.id).style('pointer-events','none');
+      g.append('line').attr('x1',p.x).attr('y1',p.y).attr('x2',q.x+w/2).attr('y2',q.y+h/2);
+      g.append('rect').attr('x',q.x).attr('y',q.y).attr('width',w).attr('height',h).attr('rx',4);
+      g.append('text').attr('class','label-name').attr('x',q.x+8).attr('y',q.y+14).text(name);
+      g.append('text').attr('x',q.x+8).attr('y',q.y+28).text(`${e.year} · ${label(e)}${e.id===state.selected?' · selected':''}`);
+    }
   }
-  function install() {
-    $('search').addEventListener('input', event => { state.search = event.target.value.trim().toLocaleLowerCase(); update(true); });
-    [['sector-filter', 'sector'], ['method-filter', 'method']].forEach(([id, key]) => $(id).addEventListener('change', event => { state[key] = event.target.value; update(true); }));
-    $('reset-button').addEventListener('click', () => { state.search = state.sector = state.method = ''; state.selected = null; $('search').value = ''; $('sector-filter').value = ''; $('method-filter').value = ''; update(true); });
-    $('prev-page').addEventListener('click', () => { state.page--; state.selected = null; update(); });
-    $('next-page').addEventListener('click', () => { state.page++; state.selected = null; update(); });
-    new ResizeObserver(() => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (Math.floor($('rank-stage').clientWidth) !== lastWidth) renderRanking(); }, 80); }).observe($('rank-stage'));
-  }
-  d3.json('data/breaches.json').then(data => {
-    if (!Array.isArray(data.events) || !data.events.length) throw new Error('Missing event data');
-    state.events = data.events.map(d => ({ ...d, searchText: [d.organization, d.year, d.sector, d.sectorRaw, d.method, d.methodRaw].join(' ').toLocaleLowerCase() }));
-    [['sector-filter', 'sector', 'All industries'], ['method-filter', 'method', 'All causes']].forEach(([id, key, label]) => {
-      const select = $(id); select.replaceChildren(); node('option', '', label, select).value = '';
-      Array.from(new Set(state.events.map(d => d[key]))).sort(d3.ascending).forEach(value => { node('option', '', value, select).value = value; });
+  function drawOverview() {
+    const width=Math.max(500,$('overview-chart').clientWidth),height=105;
+    const svg=d3.select('#overview-chart').attr('viewBox',`0 0 ${width} ${height}`);
+    svg.selectAll('*').remove();
+    overviewX=d3.scaleLinear().domain([yearMin-.5,yearMax+.5]).range([30,width-15]);
+    const counts=d3.rollup(base,v=>v.length,d=>d.year);
+    const yearData=d3.range(yearMin,yearMax+1).map(year=>({year,count:counts.get(year)||0}));
+    const y=d3.scaleLinear().domain([0,d3.max(yearData,d=>d.count)||1]).range([77,12]);
+    const barWidth=(width-45)/(yearMax-yearMin+1)-3;
+    svg.append('g').selectAll('rect').data(yearData).join('rect').attr('class',d=>`overview-bar${d.year>=state.start&&d.year<=state.end?' is-focused':''}`).attr('x',d=>overviewX(d.year)-barWidth/2).attr('y',d=>y(d.count)).attr('width',barWidth).attr('height',d=>77-y(d.count)).append('title').text(d=>`${d.year}: ${d.count} matching source events`);
+    svg.append('g').attr('class','axis').attr('transform','translate(0,77)').call(d3.axisBottom(overviewX).tickValues(d3.range(yearMin,yearMax+1,2)).tickFormat(d3.format('d')).tickSize(3));
+    svg.append('text').attr('x',27).attr('y',15).attr('text-anchor','end').attr('font-size',9).attr('fill','#65756f').text(d3.max(yearData,d=>d.count));
+    svg.append('text').attr('x',27).attr('y',78).attr('text-anchor','end').attr('font-size',9).attr('fill','#65756f').text('0');
+    brush=d3.brushX().extent([[30,8],[width-15,77]]).on('end',event=>{
+      if(syncingBrush||!event.sourceEvent)return;
+      if(!event.selection){setYears(yearMin,yearMax);return;}
+      const a=Math.ceil(overviewX.invert(event.selection[0])),b=Math.floor(overviewX.invert(event.selection[1]));
+      setYears(Math.min(a,b),Math.max(a,b));
     });
-    $('snapshot-date').textContent = 'Snapshot: September 25, 2026';
-    $('data-audit-note').textContent = '539 source events · 499 numeric counts · 40 unranked entries (11 unknown, 28 unresolved possible placeholders, 1 incompatible unit).';
-    update(); install();
-  }).catch(error => { console.error(error); $('empty-state').hidden = false; $('empty-state').textContent = 'The data could not be loaded. Reload this page or download the source JSON below.'; $('result-count').textContent = 'Data unavailable'; });
+    brushGroup=svg.append('g').attr('class','brush').call(brush);
+    syncingBrush=true;brushGroup.call(brush.move,[overviewX(state.start-.5),overviewX(state.end+.5)]);syncingBrush=false;
+  }
+  function listData() {
+    let list=focused;
+    if(state.group)list=list.filter(e=>state.group.members.includes(e.id));
+    return list.slice().sort(state.order==='name'?(a,b)=>a.organization.localeCompare(b.organization)||b.year-a.year:state.order==='largest'?(a,b)=>(b.records??-1)-(a.records??-1)||b.year-a.year:(a,b)=>b.year-a.year||(b.records??-1)-(a.records??-1));
+  }
+  function drawList() {
+    const list=listData(),pageSize=6,pages=Math.max(1,Math.ceil(list.length/pageSize));
+    state.page=Math.min(state.page,pages-1);
+    $('group-focus').hidden=!state.group;$('clear-group').hidden=!state.group;
+    if(state.group)$('group-focus').textContent=`Showing ${list.length} members of a ${state.group.year} group · ${compact(state.group.min)}–${compact(state.group.max)} reported records. Select a name to locate its exact value.`;
+    $('event-list').innerHTML=list.slice(state.page*pageSize,(state.page+1)*pageSize).map(e=>`<button class="event-list-row" data-id="${escape(e.id)}" aria-pressed="${state.selected===e.id}"><span><strong>${escape(e.organization)}</strong><small>${e.year} · ${escape(e.sector)} · ${escape(e.method)}</small></span><span>${label(e)}</span></button>`).join('')||'<p class="detail-meta">No matching events in this list.</p>';
+    $('event-list').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>selectEvent(button.dataset.id)));
+    $('page-status').textContent=`${list.length?state.page*pageSize+1:0}–${Math.min((state.page+1)*pageSize,list.length)} of ${list.length}`;
+    $('prev-page').disabled=state.page===0;$('next-page').disabled=state.page>=pages-1;
+  }
+  function drawDetails() {
+    const e=byId.get(state.selected);
+    if(!e)return;
+    const added=state.compare.includes(e.id),full=state.compare.length>=3;
+    const count=e.records==null?'Comparable count unavailable':`${d3.format(',')(e.records)}${e.recordsStatus==='approximate'?' (approx.)':''}`;
+    const sources=(e.sources||[]).filter(s=>/^https?:\/\//i.test(s.url)).map(s=>`<a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.name||'Source report')} ↗</a>`).join('');
+    $('event-detail').innerHTML=`<p class="detail-kicker">Selected event · reported ${e.year}</p><h3>${escape(e.organization)}</h3><p class="detail-count">${count}</p><p class="detail-meta">${e.records!=null?'Source-reported records · ':''}${escape(e.sector)} · ${escape(e.method)}</p><p class="detail-story">${escape(e.story||'The source sheet provides no narrative for this event.')}</p>${e.recordsNote?`<p class="detail-caveat">${escape(e.recordsNote)}</p>`:''}<div class="detail-sources">${sources||'No individual report URL provided in the source.'}</div><button class="add-comparison" ${e.records==null||added||full?'disabled':''}>${e.records==null?'No comparable numeric count':added?'Added to comparison':full?'Comparison full (3 events)':'Add to comparison'}</button>${!inFocus(e)?'<p class="detail-visibility">This selected event is outside the current filters or year window.</p>':''}`;
+    $('event-detail').querySelector('button').addEventListener('click',()=>{
+      if(e.records==null||state.compare.length>=3||state.compare.includes(e.id))return;
+      state.compare.push(e.id);drawDetails();drawComparison();announce(`${e.organization} added to the linear comparison.`);
+    });
+  }
+  function drawComparison() {
+    const list=state.compare.map(id=>byId.get(id)).filter(Boolean);
+    $('comparison-chips').innerHTML=list.map(e=>`<button data-id="${escape(e.id)}" aria-label="Remove ${escape(e.organization)} from comparison">${escape(e.organization)} · ${e.year}${!inFocus(e)?' · outside focus':''}<span aria-hidden="true">×</span></button>`).join('');
+    $('comparison-chips').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>{state.compare=state.compare.filter(id=>id!==button.dataset.id);drawDetails();drawComparison();}));
+    $('compare-empty').hidden=list.length>0;$('comparison-chart').hidden=!list.length;
+    $('clear-comparison').disabled=!list.length;
+    if(!list.length)return;
+    const width=$('comparison-stage').clientWidth,height=list.length*65+46;
+    const x=d3.scaleLinear().domain([0,d3.max(list,e=>e.records)]).nice().range([0,width-10]);
+    const svg=d3.select('#comparison-chart').attr('viewBox',`0 0 ${width} ${height}`);
+    svg.selectAll('*').remove();
+    list.forEach((e,i)=>{
+      const y=24+i*65;
+      svg.append('text').attr('x',0).attr('y',y).attr('font-size',11).attr('fill','#17332f').attr('font-weight',600).text(`${e.organization.length > Math.floor((width-115)/6) ? e.organization.slice(0,Math.max(10,Math.floor((width-115)/6)-1))+'…' : e.organization} (${e.year})`).append('title').text(`${e.organization} (${e.year})`);
+      svg.append('text').attr('x',width-10).attr('y',y).attr('font-size',11).attr('text-anchor','end').attr('fill','#17332f').text(label(e));
+      svg.append('rect').attr('x',0).attr('y',y+10).attr('width',width-10).attr('height',16).attr('fill','#edf0e7');
+      svg.append('rect').attr('class','comparison-bar').attr('data-id',e.id).attr('data-records',e.records).attr('x',0).attr('y',y+10).attr('width',x(e.records)).attr('height',16).attr('fill',color(e));
+    });
+    svg.append('g').attr('class','axis').attr('transform',`translate(0,${height-37})`).call(d3.axisBottom(x).ticks(width<500?3:6).tickFormat(compact).tickSize(4));
+    svg.append('text').attr('x',width-10).attr('y',height-5).attr('font-size',10).attr('text-anchor','end').attr('fill','#65756f').text('Reported records · linear scale, starting at zero');
+  }
+  document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
+    state.view=button.dataset.view;state.group=null;
+    const url=new URL(location.href);url.searchParams.set('view',state.view);history.replaceState(null,'',url);
+    render();announce(`${state.view==='bubbles'?'Bubble timeline':'Time by size'} view. Filters and selected events retained.`);
+  }));
+  let inputTimer;
+  $('search').addEventListener('input',()=>{clearTimeout(inputTimer);inputTimer=setTimeout(()=>{state.query=$('search').value;state.page=0;state.group=null;render();},120);});
+  [['sector-filter','sector'],['method-filter','method']].forEach(([id,key])=>$(id).addEventListener('change',()=>{state[key]=$(id).value;state.page=0;state.group=null;render();}));
+  $('year-start').addEventListener('change',()=>setYears(+$('year-start').value,Math.max(+$('year-start').value,state.end)));
+  $('year-end').addEventListener('change',()=>setYears(Math.min(state.start,+$('year-end').value),+$('year-end').value));
+  $('all-years').addEventListener('click',()=>setYears(yearMin,yearMax));
+  $('reset-button').addEventListener('click',()=>{state.query='';state.sector='';state.method='';$('search').value='';$('sector-filter').value='';$('method-filter').value='';state.order='latest';$('list-order').value='latest';setYears(yearMin,yearMax);});
+  $('list-order').addEventListener('change',()=>{state.order=$('list-order').value;state.page=0;drawList();});
+  $('prev-page').addEventListener('click',()=>{state.page--;drawList();});
+  $('next-page').addEventListener('click',()=>{state.page++;drawList();});
+  $('clear-group').addEventListener('click',()=>{state.group=null;state.page=0;drawList();});
+  $('clear-comparison').addEventListener('click',()=>{state.compare=[];drawDetails();drawComparison();announce('Comparison cleared.');});
+  render();
+  let resizeTimer;
+  new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if($('chart-stage').clientWidth!==renderedWidth){drawMain();drawOverview();}drawComparison();},150);}).observe($('explorer'));
 })();
