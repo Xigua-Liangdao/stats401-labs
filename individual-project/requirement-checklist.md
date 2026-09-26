@@ -59,7 +59,7 @@ The following checks were completed on the implemented page before deployment:
 - Two URI links point to the original source and the project page.
 - The accompanying 114-word script has a one-minute timing guide; the author still needs to rehearse its delivery.
 
-Updated deployment verification is the only remaining artifact check. Canvas submission remains intentionally unperformed.
+All requested artifacts have been checked locally and online. Canvas submission remains intentionally unperformed.
 
 ## Deployment verification
 
