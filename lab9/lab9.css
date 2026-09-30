@@ -1,0 +1,52 @@
+.lab9-page { padding-top: 36px; }
+.lab9-page .lab-heading { font-size: clamp(32px, 4.5vw, 48px); }
+.lab9-page .visualization-card, .lab9-page .design-card { padding: clamp(18px, 3vw, 30px); }
+.lab9-page .visualization-card { box-shadow: 0 8px 28px rgba(32, 50, 71, 0.06); }
+.lab9-page p { line-height: 1.6; }
+.lab9-page h3 { margin: 0 0 8px; color: #24384a; font-size: 21px; }
+.lab9-page a { color: #315f85; }
+.lab9-page .lab-nav a { color: #333; }
+.lab9-page .lab-nav a.active, .lab9-page .lab-nav a:hover { color: #fff; }
+.lab9-page .design-card p { max-width: none; color: #4e5c6e; font-size: 16px; }
+.lab9-page .chart-note { color: #687486; font-size: 13px; }
+.lab9-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 22px 0 14px; }
+.lab9-controls label { display: grid; gap: 7px; color: #536173; font-size: 13px; font-weight: 700; }
+.lab9-controls select { min-width: 280px; min-height: 42px; padding: 9px 12px; border: 1px solid #b9c6d4; border-radius: 6px; background: #fff; color: #172033; font: inherit; font-size: 14px; }
+.lab9-controls button { min-height: 42px; padding: 10px 16px; border: 1px solid #b9c6d4; border-radius: 6px; background: #eef3f8; color: #24384a; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.lab9-controls button:hover { background: #e3ebf4; }
+.lab9-controls :disabled { opacity: 0.5; cursor: default; }
+.lab9-page :focus-visible { outline: 3px solid rgba(49, 95, 133, 0.4); outline-offset: 3px; }
+.selection-status { min-height: 44px; margin: 0 0 20px; padding: 10px 14px; border-left: 3px solid #315f85; border-radius: 0 6px 6px 0; background: #f0f5fa; color: #354255; font-size: 14px; }
+.lab9-maps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.map-description { min-height: 42px; margin-bottom: 12px; color: #687486; font-size: 13px; }
+.map-frame { overflow: hidden; border: 1px solid #e1e6ec; border-radius: 10px; background: #f8fafd; }
+.map-frame svg { display: block; width: 100%; height: auto; cursor: grab; touch-action: none; }
+.map-frame svg:active { cursor: grabbing; }
+.map-region { cursor: pointer; stroke: #fff; stroke-width: 0.55; vector-effect: non-scaling-stroke; }
+.map-region.is-active { stroke: #24384a; stroke-width: 2; }
+.map-region:focus { outline: none; stroke: #24384a; stroke-width: 2; }
+.cartogram-circle { stroke: #fff; stroke-width: 1; }
+.cartogram-label { fill: #354255; font-weight: 700; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+#color-legend, #area-legend { margin-top: 14px; }
+#color-legend svg, #area-legend svg { display: block; width: 100%; height: auto; }
+.legend-label { fill: #536173; font-size: 12px; }
+.legend-title { fill: #354255; font-size: 13px; font-weight: 700; }
+.map-help { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 8px; padding-top: 18px; border-top: 1px solid #dce4ed; color: #536173; font-size: 12px; }
+.map-help span { display: inline-flex; align-items: center; gap: 7px; }
+.map-help i { display: inline-block; width: 13px; height: 13px; border-radius: 3px; }
+.missing-key { border: 1px solid #d4dbe3; background: #e4e8ed; }
+.selected-key { border: 2px solid #24384a; background: #efd0db; }
+.interaction-note { margin: 12px 0 0; }
+#lab9-tooltip { position: fixed; z-index: 30; max-width: min(300px, calc(100vw - 20px)); padding: 12px 14px; border: 1px solid rgba(23,32,51,0.15); border-radius: 9px; color: #354255; background: rgba(255,255,255,0.98); box-shadow: 0 12px 30px rgba(23,32,51,0.18); font-size: 13px; line-height: 1.5; pointer-events: none; }
+#lab9-tooltip strong { display: block; margin-bottom: 4px; color: #172033; }
+@media (max-width: 900px) {
+    .lab9-maps { grid-template-columns: 1fr; gap: 24px; }
+    .map-description { min-height: 0; }
+}
+@media (max-width: 600px) {
+    .lab9-page { padding-top: 24px; }
+    .lab9-page .visualization-card, .lab9-page .design-card { padding: 16px; border-radius: 10px; }
+    .lab9-page .lab-nav a { padding: 8px 10px; }
+    .lab9-controls label { width: 100%; }
+    .lab9-controls select { width: 100%; min-width: 0; }
+}

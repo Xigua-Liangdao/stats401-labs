@@ -3,17 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 9 — STATS 401</title>
+    <title>Lab 9 — Mapping the Global Economy</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="lab9.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+    <script src="lab9.js" defer></script>
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 9</h1>
-            <p>Lab 9 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab9-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 9</p>
+            <h1 class="lab-heading">Mapping the Global Economy</h1>
+            <p class="lab-description">The same 2025 GDP data, viewed through geographic boundaries and proportional area.</p>
+        </header>
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a><a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a><a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a><a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a><a href="../lab8/index.html">Lab 8</a>
+            <a class="active" href="index.html" aria-current="page">Lab 9</a><a href="../lab10/index.html">Lab 10</a>
+        </nav>
+
+        <section class="design-card" aria-labelledby="dataset-heading">
+            <h2 id="dataset-heading">Dataset</h2>
+            <p>The course dataset contains the 50 largest economies by <strong>2025 nominal GDP</strong>, measured at current prices in billions of US dollars. It is based on the IMF World Economic Outlook, October 2025; values may include staff estimates and later revisions. These are total GDP values, not GDP per person.</p>
+            <p>GDP records are joined to Natural Earth country boundaries using ISO-3 identifiers. Gray regions in the choropleth are outside the provided dataset: their GDP is missing here, not zero. Both maps use the same 50 values.</p>
+            <p class="chart-note"><a href="../data/lab9_gdp_2025_top50.csv">Course GDP data</a> · <a href="https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/" target="_blank" rel="noopener">Natural Earth boundaries (1:50m)</a> · <a href="../data/lab9_sources.json">Sources and join check</a>. Accessed September 30, 2026. Antarctica omitted.</p>
         </section>
+
+        <section class="visualization-card" aria-labelledby="maps-heading">
+            <h2 id="maps-heading">2025 GDP: color and area</h2>
+            <div class="lab9-controls">
+                <label>Country / economy<select id="country-select" disabled><option value="">Select an economy</option></select></label>
+                <button id="reset-view" type="button" disabled>Reset views</button>
+            </div>
+            <p id="selection-status" class="selection-status" role="status">Loading maps…</p>
+            <div class="lab9-maps">
+                <section aria-labelledby="choropleth-heading">
+                    <h3 id="choropleth-heading">GDP choropleth</h3>
+                    <p class="map-description">Geographic boundaries · color represents GDP</p>
+                    <div id="choropleth" class="map-frame"></div>
+                    <div id="color-legend" aria-label="GDP color scale"></div>
+                    <p class="chart-note">Equal Earth projection. The logarithmic color scale separates smaller economies while retaining the full GDP range.</p>
+                </section>
+                <section aria-labelledby="cartogram-heading">
+                    <h3 id="cartogram-heading">GDP cartogram</h3>
+                    <p class="map-description">Dorling cartogram · circle area represents GDP</p>
+                    <div id="cartogram" class="map-frame"></div>
+                    <div id="area-legend" aria-label="GDP circle area scale"></div>
+                    <p class="chart-note">Circles move apart near their geographic anchors; faint boundaries provide context. Circle areas are proportional to GDP. Shapes, borders, and exact positions are not preserved.</p>
+                </section>
+            </div>
+            <div class="map-help"><span><i class="missing-key"></i>Not in the top-50 dataset</span><span><i class="selected-key"></i>Same economy highlighted in both maps</span></div>
+            <p class="chart-note interaction-note">Hover to compare; click to keep a selection. Scroll to zoom and drag to pan either map. The selector also reaches small economies such as Singapore and Hong Kong SAR. Circle labels use ISO-3 codes.</p>
+        </section>
+
+        <section class="design-card" aria-labelledby="comparison-heading">
+            <h2 id="comparison-heading">Design and comparison</h2>
+            <div id="design-comparison">
+                <p>The choropleth makes Russia, Canada, China, and the United States visually prominent because their land areas are large. The United States and China also receive the darkest GDP colors. I used a logarithmic pink scale because values range from about $300 billion to $30,616 billion; a linear scale would leave most economies nearly indistinguishable.</p>
+                <p>In the Dorling cartogram, circle area is directly proportional to GDP, with radius proportional to its square root. The United States and China dominate, together accounting for 45.6% of GDP in this dataset. Germany, Japan, and the United Kingdom gain visual weight relative to their geographic footprints. Russia, Canada, and Australia lose it. Singapore and Hong Kong become easier to locate and compare despite their small territories.</p>
+                <p>The Equal Earth choropleth preserves recognizable boundaries, neighboring relationships, and relative land areas. It is useful for locating economies and examining regional patterns. The cartogram replaces shapes with circles and shifts positions to prevent overlap, so exact distances and shared borders are lost. It better supports comparisons of economic magnitude, especially when land size and GDP differ substantially.</p>
+                <p>Linked highlighting keeps each economy identifiable across these views. Color shows where large values occur; proportional area makes their concentration more apparent. Gray choropleth regions have no supplied GDP value, and the circles represent only the top 50 economies, not the entire world economy.</p>
+            </div>
+        </section>
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+    <div id="lab9-tooltip" role="tooltip" hidden></div>
 </body>
 </html>
