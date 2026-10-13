@@ -1,0 +1,16 @@
+.voice-controls { margin: 20px 0; padding: 18px 20px; border: 1px solid #ead3de; border-radius: 10px; background: #fff8fb; }
+.voice-controls > p:first-child { margin-bottom: 14px; color: #354255; font-size: 15px; }
+.voice-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.voice-buttons button { min-height: 40px; padding: 9px 18px; border: 1px solid #b9c6d4; border-radius: 6px; color: #24384a; background: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.voice-buttons #listen-button { border-color: #925373; background: #925373; color: #fff; }
+.voice-buttons button:disabled { opacity: 0.45; cursor: default; }
+#voice-status { flex: 1 1 240px; color: #596173; font-size: 13px; line-height: 1.5; }
+.voice-feedback { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px 24px; margin: 18px 0 12px; }
+.voice-feedback dt { margin-bottom: 4px; color: #7d5b6c; font-size: 12px; font-weight: 700; }
+.voice-feedback dd { margin: 0; color: #354255; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.voice-controls .chart-note { margin-bottom: 0; font-size: 12px; }
+.lab10-page #reflection p { max-width: 900px; }
+@media (max-width: 600px) {
+    .voice-controls { padding: 15px; }
+    .voice-feedback { grid-template-columns: 1fr; }
+}

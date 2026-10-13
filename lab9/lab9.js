@@ -143,24 +143,33 @@ async function initialize() {
             });
     }
 
-    selector.on("change", function () {
-        selected = this.value || null;
+    function selectEconomy(id) {
+        if (id !== null && !byId.has(id)) return null;
+        selected = id;
         hovered = null;
         tooltip.attr("hidden", true);
         updateHighlight();
-    });
-    d3.select("#reset-view").on("click", () => {
+        return byId.get(id) || null;
+    }
+
+    function resetVisualization() {
         selected = null;
         hovered = null;
         tooltip.attr("hidden", true);
         for (const {svg, zoom} of maps) svg.interrupt().call(zoom.transform, d3.zoomIdentity);
         updateHighlight();
-    });
+    }
+
+    selector.on("change", function () { selectEconomy(this.value || null); });
+    d3.select("#reset-view").on("click", resetVisualization);
     d3.selectAll(".lab9-controls select, .lab9-controls button").property("disabled", false);
     updateHighlight();
+    window.gdpMap = {selectEconomy, resetVisualization, economies: stats};
+    window.dispatchEvent(new Event("gdp-map-ready"));
 }
 
 initialize().catch(error => {
     d3.select("#selection-status").text("The map data could not be loaded. Please reload the page.");
+    window.dispatchEvent(new Event("gdp-map-error"));
     console.error(error);
 });

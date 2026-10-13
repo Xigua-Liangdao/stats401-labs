@@ -3,17 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 10 — STATS 401</title>
+    <title>Lab 10 — Find an Economy by Voice</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../lab9/lab9.css">
+    <link rel="stylesheet" href="lab10.css">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" defer></script>
+    <script src="../lab9/lab9.js?v=lab10" defer></script>
+    <script src="voice.js" type="module"></script>
 </head>
 <body>
-    <main class="page-shell">
-        <section class="placeholder-card">
-            <p class="eyebrow">STATS 401</p>
-            <h1>Lab 10</h1>
-            <p>Lab 10 will be added here.</p>
-            <a class="back-link" href="../index.html">← Back to home</a>
+    <main class="page-shell lab2-page lab9-page lab10-page">
+        <header>
+            <p class="eyebrow">STATS 401 · Lab 10</p>
+            <h1 class="lab-heading">Find an Economy by Voice</h1>
+            <p class="lab-description">A voice-controlled extension of the GDP maps from <a href="../lab9/index.html">Lab 9</a>.</p>
+        </header>
+        <nav class="lab-nav" aria-label="Course labs">
+            <a href="../lab1/index.html">Lab 1</a><a href="../lab2/index.html">Lab 2</a>
+            <a href="../lab3/index.html">Lab 3</a><a href="../lab4/index.html">Lab 4</a>
+            <a href="../lab5/index.html">Lab 5</a><a href="../lab6/index.html">Lab 6</a>
+            <a href="../lab7/index.html">Lab 7</a><a href="../lab8/index.html">Lab 8</a>
+            <a href="../lab9/index.html">Lab 9</a><a class="active" href="index.html" aria-current="page">Lab 10</a>
+        </nav>
+
+        <section class="visualization-card" aria-labelledby="maps-heading">
+            <h2 id="maps-heading">2025 GDP</h2>
+            <div class="voice-controls" aria-label="Voice controls">
+                <p>Click Listen, allow microphone access, and wait for “Listening”. Say <strong>“highlight Japan”</strong> (or another economy from the menu), or <strong>“reset”</strong> to clear the selection and restore both maps. One English command per click.</p>
+                <div class="voice-buttons">
+                    <button id="listen-button" type="button" aria-pressed="false" disabled>Listen</button>
+                    <button id="stop-listening" type="button" disabled>Stop</button>
+                    <span id="voice-status" role="status">Waiting for the maps…</span>
+                </div>
+                <dl class="voice-feedback" aria-live="polite">
+                    <div><dt>Heard</dt><dd id="heard-command">—</dd></div>
+                    <div><dt>Result</dt><dd id="voice-action">No voice command yet.</dd></div>
+                </dl>
+                <p class="chart-note">The microphone stays off until you click Listen. Your browser may send audio to its speech service; this page does not save audio or transcripts.</p>
+            </div>
+            <div class="lab9-controls">
+                <label>Country / economy<select id="country-select" disabled><option value="">Select an economy</option></select></label>
+                <button id="reset-view" type="button" disabled>Reset views</button>
+            </div>
+            <p id="selection-status" class="selection-status" role="status">Loading maps…</p>
+            <div class="lab9-maps">
+                <section aria-labelledby="choropleth-heading">
+                    <h3 id="choropleth-heading">GDP choropleth</h3>
+                    <p class="map-description">Geographic boundaries · color represents GDP</p>
+                    <div id="choropleth" class="map-frame"></div>
+                    <div id="color-legend" aria-label="GDP color scale"></div>
+                </section>
+                <section aria-labelledby="cartogram-heading">
+                    <h3 id="cartogram-heading">GDP cartogram</h3>
+                    <p class="map-description">Dorling cartogram · circle area represents GDP</p>
+                    <div id="cartogram" class="map-frame"></div>
+                    <div id="area-legend" aria-label="GDP circle area scale"></div>
+                </section>
+            </div>
+            <div class="map-help"><span><i class="missing-key"></i>Not in the top-50 dataset</span><span><i class="selected-key"></i>Same economy highlighted in both maps</span></div>
+            <p class="chart-note interaction-note">You can also choose from the menu or click a country. Scroll to zoom and drag to pan.</p>
         </section>
+
+        <section class="design-card" aria-labelledby="reflection-heading">
+            <h2 id="reflection-heading">Design reflection</h2>
+            <div id="reflection">
+                <p>I extended the two GDP maps from Lab 9 because finding a small economy on the world map can take more effort than comparing its value. Saying “highlight Singapore” selects it in both views and brings its GDP into the status line. “Reset” clears the selection and restores the original zoom.</p>
+                <p>Both commands use the same functions as the dropdown and reset button. The microphone listens for one command at a time, and the page shows what it heard beside the result. If a name comes through incorrectly, the mismatch is visible before the next comparison.</p>
+                <p>The CSV calls South Korea “Korea, Republic of”, so I added everyday names such as “South Korea” and “Hong Kong”. In transcript tests, an unknown name left the current selection alone. These checks cover command handling; live microphone accuracy has not been measured. Accents, background noise, and browser support still need testing. The menu remains available when speaking is inconvenient or microphone access is blocked.</p>
+            </div>
+        </section>
+        <a class="back-link" href="../index.html">← Back to home</a>
     </main>
+    <div id="lab9-tooltip" role="tooltip" hidden></div>
 </body>
 </html>
